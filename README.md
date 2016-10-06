@@ -143,3 +143,5 @@ Some transcripts might be very similar.
 Or maybe they differ only in parts not affected by the SNP.
 In this situation, it's not surprising for more than two transcripts to be affected.
 
+`sqtl.plot` function was implemented for this purpose. There is an example at the end of the [R-markdown Overview](docs/sQTLseekeR-Overview.md).
+
