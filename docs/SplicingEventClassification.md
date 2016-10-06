@@ -15,7 +15,7 @@ Building the transcript structure
 
 The *data.frame* with the transcript structure must have these columns:
 
--   `transId`: the transcript ID.
+-   `trId`: the transcript ID.
 -   `strand`: the DNA strand.
 -   `cdsStart`: the start positions of the CDS regions, separated by `,`.
 -   `cdsEnd`: same with the end positions.
@@ -26,7 +26,7 @@ Depending on the annotation you are using, you might need to build this *data.fr
 For now, let's create a simple one to see how the function works.
 
 ``` r
-tr.str = data.frame(transId=c("t1","t2","t3"),
+tr.str = data.frame(trId=c("t1","t2","t3"),
                     strand="+",
                     cdsStarts=c("10,40,100","10,20,100","10,40,100"),
                     cdsEnds=c("15,55,130","15,30,130","15,55,130"),
@@ -35,10 +35,10 @@ tr.str = data.frame(transId=c("t1","t2","t3"),
 tr.str
 ```
 
-    ##   transId strand cdsStarts   cdsEnds utrStarts utrEnds
-    ## 1      t1      + 10,40,100 15,55,130     5,130  10,135
-    ## 2      t2      + 10,20,100 15,30,130     5,130  10,135
-    ## 3      t3      + 10,40,100 15,55,130     5,130  10,150
+    ##   trId strand cdsStarts   cdsEnds utrStarts utrEnds
+    ## 1   t1      + 10,40,100 15,55,130     5,130  10,135
+    ## 2   t2      + 10,20,100 15,30,130     5,130  10,135
+    ## 3   t3      + 10,40,100 15,55,130     5,130  10,150
 
 Comparing pairs of transcripts
 ------------------------------
@@ -87,9 +87,9 @@ Then for each transcript with CDS or UTRs, we concatenate the start/end position
 library(dplyr)
 concat <- function(x) paste(x, collapse=",")
 trans.str = gtf %>% filter(type %in% c("CDS","UTR")) %>%
-    mutate(transId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
+    mutate(trId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
            geneId=gsub(".*gene_id ([^;]+);.*","\\1",info)) %>%
-        group_by(transId, geneId, strand) %>%
+        group_by(trId, geneId, strand) %>%
             summarize(cdsStarts=concat(start[type=="CDS"]),
                       cdsEnds=concat(end[type=="CDS"]),
                       utrStarts=concat(start[type=="UTR"]),
@@ -100,14 +100,16 @@ For transcripts without CDS, we use the *exon* annotation instead. This is optio
 
 ``` r
 exon.str = gtf %>% filter(type=="exon") %>%
-    mutate(transId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
+    mutate(trId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
            geneId=gsub(".*gene_id ([^;]+);.*","\\1",info)) %>%
-        filter(!(transId %in% trans.str$transId)) %>%
-            group_by(transId, geneId, strand) %>%
+        filter(!(trId %in% trans.str$trId)) %>%
+            group_by(trId, geneId, strand) %>%
                 summarize(cdsStarts=concat(start),cdsEnds=concat(end),
                           utrStarts=NA, utrEnds=NA)
 trans.str = rbind(trans.str, exon.str)
 ```
+
+The results is available in the [Data](https://github.com/guigolab/sQTLseekeR/tree/master/Data) folder, but the code shows you how to format the object from scratch.
 
 Now we read the sQTLs from one population, CEU. After erasing the event classification, we recompute them using `classify.events`.
 
@@ -166,7 +168,7 @@ library(ggplot2)
 ggplot(ev.sqtls$stats, aes(x=event, y=prop.sqtl)) + geom_bar(stat="identity") + coord_flip() + ylab("proportion of sQTLs")
 ```
 
-![](SplicingEventClassification_files/figure-markdown_github/unnamed-chunk-8-1.png)<!-- -->
+![](SplicingEventClassification_files/figure-markdown_github/unnamed-chunk-9-1.png)
 
 Null distribution
 -----------------
@@ -175,7 +177,7 @@ It's good to know the general distribution of the splicing events affected by sQ
 
 ``` r
 ## Function that picks two random transcripts for an input gene
-geneToTrans = tapply(trans.str$transId, trans.str$geneId, identity)
+geneToTrans = tapply(trans.str$trId, trans.str$geneId, identity)
 pickRandomTrans <- function(gene) head(c(sample(geneToTrans[[gene]]),NA, NA),2)
 ## Build a data.frame with the random transcript pairs
 cont.pairs = sapply(sqtl.df$geneId, pickRandomTrans)
@@ -197,7 +199,7 @@ stats.df = rbind(data.frame(set="sQTLs", ev.sqtls$stats),
 ggplot(stats.df, aes(x=event, y=prop.sqtl, fill=set)) + geom_bar(stat="identity", position="dodge") + coord_flip() + ylab("proportion of sQTLs")
 ```
 
-![](SplicingEventClassification_files/figure-markdown_github/unnamed-chunk-11-1.png)<!-- -->
+![](SplicingEventClassification_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
 Appendix
 --------
@@ -224,13 +226,13 @@ sessionInfo()
     ## [1] stats     graphics  grDevices utils     datasets  methods   base     
     ## 
     ## other attached packages:
-    ## [1] ggplot2_2.0.0   dplyr_0.4.3     sQTLseekeR_2.1  rmarkdown_0.9.2
+    ## [1] ggplot2_2.1.0   dplyr_0.5.0     sQTLseekeR_2.1  rmarkdown_0.9.6
     ## 
     ## loaded via a namespace (and not attached):
-    ##  [1] Rcpp_0.12.3      knitr_1.12.3     magrittr_1.5     munsell_0.4.3   
-    ##  [5] colorspace_1.2-6 R6_2.1.2         plyr_1.8.3       stringr_1.0.0   
-    ##  [9] tools_3.2.3      parallel_3.2.3   grid_3.2.3       data.table_1.9.6
-    ## [13] gtable_0.1.2     DBI_0.3.1        htmltools_0.3    yaml_2.1.13     
-    ## [17] lazyeval_0.1.10  assertthat_0.1   digest_0.6.9     formatR_1.2.1   
-    ## [21] codetools_0.2-14 evaluate_0.8     labeling_0.3     stringi_1.0-1   
-    ## [25] compiler_3.2.3   scales_0.3.0     chron_2.3-47
+    ##  [1] Rcpp_0.12.7      knitr_1.13.1     magrittr_1.5     munsell_0.4.3   
+    ##  [5] colorspace_1.2-6 R6_2.1.2         plyr_1.8.4       stringr_1.1.0   
+    ##  [9] tools_3.2.3      grid_3.2.3       data.table_1.9.6 gtable_0.2.0    
+    ## [13] DBI_0.5-1        htmltools_0.3.5  yaml_2.1.13      lazyeval_0.2.0  
+    ## [17] digest_0.6.10    assertthat_0.1   tibble_1.2       formatR_1.4     
+    ## [21] codetools_0.2-14 evaluate_0.9     labeling_0.3     stringi_1.1.1   
+    ## [25] scales_0.4.0     chron_2.3-47

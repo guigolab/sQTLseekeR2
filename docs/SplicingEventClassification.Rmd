@@ -23,7 +23,7 @@ To compare the structure of pairs of transcripts, we can either use [AStalavista
 
 The *data.frame* with the transcript structure must have these columns:
 
-+ `transId`: the transcript ID.
++ `trId`: the transcript ID.
 + `strand`: the DNA strand.
 + `cdsStart`: the start positions of the CDS regions, separated by `,`.
 + `cdsEnd`: same with the end positions.
@@ -34,7 +34,7 @@ Depending on the annotation you are using, you might need to build this *data.fr
 For now, let's create a simple one to see how the function works.
 
 ```{r, message=FALSE, warning=FALSE}
-tr.str = data.frame(transId=c("t1","t2","t3"),
+tr.str = data.frame(trId=c("t1","t2","t3"),
                     strand="+",
                     cdsStarts=c("10,40,100","10,20,100","10,40,100"),
                     cdsEnds=c("15,55,130","15,30,130","15,55,130"),
@@ -77,9 +77,9 @@ Then for each transcript with CDS or UTRs, we concatenate the start/end position
 library(dplyr)
 concat <- function(x) paste(x, collapse=",")
 trans.str = gtf %>% filter(type %in% c("CDS","UTR")) %>%
-    mutate(transId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
+    mutate(trId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
            geneId=gsub(".*gene_id ([^;]+);.*","\\1",info)) %>%
-        group_by(transId, geneId, strand) %>%
+        group_by(trId, geneId, strand) %>%
             summarize(cdsStarts=concat(start[type=="CDS"]),
                       cdsEnds=concat(end[type=="CDS"]),
                       utrStarts=concat(start[type=="UTR"]),
@@ -90,14 +90,19 @@ For transcripts without CDS, we use the *exon* annotation instead. This is optio
 
 ```{r, message=FALSE, warning=FALSE, cache=TRUE}
 exon.str = gtf %>% filter(type=="exon") %>%
-    mutate(transId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
+    mutate(trId=gsub(".*transcript_id ([^;]+);.*","\\1",info),
            geneId=gsub(".*gene_id ([^;]+);.*","\\1",info)) %>%
-        filter(!(transId %in% trans.str$transId)) %>%
-            group_by(transId, geneId, strand) %>%
+        filter(!(trId %in% trans.str$trId)) %>%
+            group_by(trId, geneId, strand) %>%
                 summarize(cdsStarts=concat(start),cdsEnds=concat(end),
                           utrStarts=NA, utrEnds=NA)
 trans.str = rbind(trans.str, exon.str)
 ```
+
+```{r, message=FALSE, warning=FALSE, echo=FALSE}
+save(trans.str, file="../Data/transcriptStructureGencodeV12.RData")
+```
+The results is available in the [Data](https://github.com/guigolab/sQTLseekeR/tree/master/Data) folder, but the code shows you how to format the object from scratch.
 
 Now we read the sQTLs from one population, CEU. After erasing the event classification, we  recompute them using `classify.events`.
 
@@ -129,7 +134,7 @@ It's good to know the general distribution of the splicing events affected by sQ
 
 ```{r, message=FALSE, warning=FALSE}
 ## Function that picks two random transcripts for an input gene
-geneToTrans = tapply(trans.str$transId, trans.str$geneId, identity)
+geneToTrans = tapply(trans.str$trId, trans.str$geneId, identity)
 pickRandomTrans <- function(gene) head(c(sample(geneToTrans[[gene]]),NA, NA),2)
 ## Build a data.frame with the random transcript pairs
 cont.pairs = sapply(sqtl.df$geneId, pickRandomTrans)

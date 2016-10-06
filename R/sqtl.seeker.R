@@ -26,7 +26,7 @@
 ##'
 ##' In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 ##' groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2
-##' there is one transcript whose relative expression shifted by 20% between two genotype groups.
+##' there is one transcript whose relative expression shifted by 20 percent between two genotype groups.
 ##' @title sQTL seeker
 ##' @param tre.df a data.frame with transcript relative expression
 ##' produced by 'prepare.trans.exp'.
@@ -114,7 +114,7 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
           gr.gene.spl = c(gr.gene.spl, gr.gene.spl.ii)
         }
       }
-      
+
       res.df = lapply(1:length(gr.gene.spl), function(ii){
         res.range = data.frame()
         if(verbose){message("  Sub-range ",ii)}
@@ -139,7 +139,7 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
         return(res.range)
       })
       range.done = which(unlist(lapply(res.df, nrow))>0)
-      
+
       if(length(range.done)>0){
         res.df = res.df[range.done]
         res.df = do.call(rbind, res.df)

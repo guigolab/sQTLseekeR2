@@ -1,6 +1,6 @@
 ##' Find the splicing event(s) that differenciate pairs of transcripts.
 ##'
-##' The input transcript structure is a data.frame with information about the CDSs and UTRs start/end positions as well as the DNA strand. The columns should be: 'transId' for the transcript ID; 'strand' for the DNA strand; 'cdsStart' for the CDS start positions; 'cdsEnds' for the end positions; 'utrStarts' and 'utrEnds' for the UTRs. The position in 'cdsStarts'/'cdsEnds'/'utrStart'/'utrEnds' must be a concatenation of the position with ',' as separator. See example.
+##' The input transcript structure is a data.frame with information about the CDSs and UTRs start/end positions as well as the DNA strand. The columns should be: 'trId' for the transcript ID; 'strand' for the DNA strand; 'cdsStart' for the CDS start positions; 'cdsEnds' for the end positions; 'utrStarts' and 'utrEnds' for the UTRs. The position in 'cdsStarts'/'cdsEnds'/'utrStart'/'utrEnds' must be a concatenation of the position with ',' as separator. See example.
 ##'
 ##' The classification code follows mostly the one defined by AStalavista (\url{http://genome.crg.es/astalavista/FAQ.html}). Numbers represent exon boundaries and are ordered by genomic position, '-' represents exon body, '^' a splice junction and ')' the end of the transcript. The state of the two transcript is separated by a ','. For example, '1-2^,3-4^' represent mutually exclusive exons, ',1^2-' means intron retention. In addition, we added an extra formatting: '<>' means that the event involves UTRs. Hence '<>,1^),2^)' means alternative 3' UTR.
 ##' @title Classify splicing events
@@ -14,7 +14,7 @@
 ##' @examples
 ##'
 ##' ## Creating a fake transcript structure
-##' tr.str = data.frame(transId=c("t1","t2","t3"),strand="+",
+##' tr.str = data.frame(trId=c("t1","t2","t3"),strand="+",
 ##' cdsStarts=c("10,40,100","10,20,100","10,40,100"),
 ##' cdsEnds=c("15,55,130","15,30,130","15,55,130"),
 ##' utrStarts=c("5,130","5,130","5,130"),
@@ -33,7 +33,7 @@ classify.events <- function(df, trans.struct){
   for(col in colnames(trans.struct)){
     trans.struct[,col] = as.character(trans.struct[,col])
   }
-  rownames(trans.struct) = trans.struct$transId
+  rownames(trans.struct) = trans.struct$trId
 
   ## Translate a splicing code into a splicing event names
   translate.event <- function(events){

@@ -12,9 +12,9 @@
 library(sQTLseekeR)
 
 ## Input files: transcript expression, gene location and genotype information
-trans.exp.f = "transExpression.tsv.gz"
-gene.bed.f = "genes.bed"
-genotype.f = "snps-012coded.tsv"
+trans.exp.f = "../Data/transExpression.tsv.gz"
+gene.bed.f = "../Data/genes.bed"
+genotype.f = "../Data/snps-012coded.tsv"
 
 ## 1) Index the genotype file (if not done externally before)
 genotype.indexed.f = index.genotype(genotype.f)

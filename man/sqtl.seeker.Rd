@@ -80,7 +80,7 @@ values of the distance matrix.
 
 In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2
-there is one transcript whose relative expression shifted by 20% between two genotype groups.
+there is one transcript whose relative expression shifted by 20 percent between two genotype groups.
 }
 \author{
 Jean Monlong
