@@ -27,14 +27,27 @@ sqtl.plot <- function(geneId, snpId, tre.df, genotype.f, gene.loc, genic.window=
     trId = tre = type = strand = . = NULL
 
     splitTS <- function(df){
-        cds = data.frame(type="CDS",
-            start=as.integer(unlist(strsplit(df$cdsStarts, ","))),
-            end = as.integer(unlist(strsplit(df$cdsEnds, ","))),
-            stringsAsFactors=FALSE)
-        utr = data.frame(type="UTR",
-            start = as.integer(unlist(strsplit(df$utrStarts,","))),
-            end = as.integer(unlist(strsplit(df$utrEnds,","))),
-            stringsAsFactors=FALSE)
+        if(df$cdsStarts != "" & df$cdsEnds != ""){
+            cds = data.frame(type="CDS",
+                start=as.integer(unlist(strsplit(df$cdsStarts, ","))),
+                end = as.integer(unlist(strsplit(df$cdsEnds, ","))),
+                stringsAsFactors=FALSE)
+        } else {
+            cds = data.frame()
+        }
+        if(df$utrStarts != "" & df$utrEnds != ""){
+            utr = data.frame(type="UTR",
+                start = as.integer(unlist(strsplit(df$utrStarts,","))),
+                end = as.integer(unlist(strsplit(df$utrEnds,","))),
+                stringsAsFactors=FALSE)
+        } else {
+            utr = data.frame()
+        }
+        if(length(cds)==0 & length(utr)==0){
+            stop(as.character(df$trId), " has neither CDS nor UTR in the transcript structure annotation. Something must be wrong.")
+        } else if(length(cds)==0){
+            warning(as.character(df$trId), " has no CDS in the transcript structure annotation. Something might be wrong but continuing anyway.")
+        }
         data.frame(df[,c("trId","geneId","strand")], rbind(cds, utr))
     }
 
