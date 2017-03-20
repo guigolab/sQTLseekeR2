@@ -51,7 +51,7 @@ a data.frame with columns
 \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 }
 \description{
-\code{sqtl.seeker} is the main function of \code{sQTLseekeR} package. From transcript relative expression,
+\code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
 file, indexed by function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint

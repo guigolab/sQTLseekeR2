@@ -2,7 +2,7 @@
 #### Some internal benchmark to guide optimization
 ##
 
-## library(sQTLseekeR)
+## library(sQTLseekeR2)
 devtools::load_all("..")
 
 library(plyr)

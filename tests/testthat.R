@@ -1,4 +1,4 @@
 library(testthat)
 library(sQTLseekeR)
 
-test_check("sQTLseekeR")
+test_check("sQTLseekeR2")

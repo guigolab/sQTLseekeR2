@@ -3,7 +3,7 @@ Type: Package
 Title: Splicing QTL discovery tool
 Version: 1.0
 Date: 2017-03-20
-Author: Diego Garrido, Ferran Reverter, Jean Monlong, Miquel Calvo, Roderic Guigo.
+Author: Diego Garrido, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigo.
 Maintainer: Diego Garrido <dgarrimar@gmail.com>
 Description: Developing version of the new sQTLseekeR package
 License: GPL-2

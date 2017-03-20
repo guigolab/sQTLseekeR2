@@ -9,7 +9,7 @@
 ## to check is the package is correctly installed and the inputs correctly formatted.
 ##
 
-library(sQTLseekeR)
+library(sQTLseekeR2)
 
 ## Input files: transcript expression, gene location and genotype information
 trans.exp.f = "../Data/transExpression.tsv.gz"

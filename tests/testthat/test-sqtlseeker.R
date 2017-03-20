@@ -1,4 +1,4 @@
-context("sQTLseekeR main workflow")
+context("sQTLseekeR2 main workflow")
 
 samples = paste0("samp",1:40)
 
