@@ -9,7 +9,7 @@
 ## to check is the package is correctly installed and the inputs correctly formatted.
 ##
 
-library(sQTLseekeR2)
+#library(sQTLseekeR)
 
 ## Input files: transcript expression, gene location and genotype information
 trans.exp.f = "../Data/transExpression.tsv.gz"
@@ -17,7 +17,7 @@ gene.bed.f = "../Data/genes.bed"
 genotype.f = "../Data/snps-012coded.tsv"
 
 ## 1) Index the genotype file (if not done externally before)
-genotype.indexed.f = index.genotype(genotype.f)
+genotype.indexed.f = sQTLseekeR2::index.genotype(genotype.f)
 
 ## 2) Prepare transcript expression
 te.df = read.table(trans.exp.f, as.is=TRUE, header=TRUE, sep="\t")

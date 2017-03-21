@@ -13,7 +13,7 @@ te.dispersion(tr)
 a value for the dispersion
 }
 \description{
-Compute the dispersion from the transcript expression matrix. 
+Compute the dispersion from a gene's transcript expression matrix. 
 Dispersion is computed as the mean Hellinger distance to the centroid.
 }
 \author{
