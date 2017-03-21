@@ -12,7 +12,7 @@ te.dispersion = function (tr) {
     b <- sqrt(sum(a * a))
     return(b)
   }
-  c <- as.numeric(apply(tr, 1, function(x)(mean(x, na.rm=T))))         
-  d <- mean(apply(tr, 2, function(x)(hellingerDist.p(x, c))), na.rm=T)  
+  c <- as.numeric(apply(tr, 1, function(x)(mean(x, na.rm = T))))         
+  d <- mean(apply(tr, 2, function(x)(hellingerDist.p(x, c))), na.rm = T)  
   return(d)
 }
