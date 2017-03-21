@@ -7,11 +7,11 @@
 ##' @return a vector with the relative expression.
 ##' @author Jean Monlong
 ##' @keywords internal
-relativize <- function(x, min.gene.exp=.01){
-    x = as.numeric(x)
+relativize <- function(x, min.gene.exp = .01){
+    x <- as.numeric(x)
     if (!any(is.na(x)) && sum(x) > min.gene.exp) {
         x/sum(x)
     } else {
-        return(rep(NA,length(x)))
+        return(rep(NA, length(x)))
     }
 }

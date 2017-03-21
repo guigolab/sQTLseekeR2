@@ -8,7 +8,7 @@
 ##' filters remove SNP with :
 ##' \itemize{
 ##' \item{more than 3 unknown genotypes}
-##' \item{less than 5 samples in any genotype group}
+##' \item{less than 10 samples in any genotype group}
 ##' \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 ##'
 ##' Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
@@ -56,7 +56,7 @@
 ##' \item{pv}{the P-value}
 ##' \item{nb.perms}{the number of permutation used for the P-value computation}
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
-##' @author Jean Monlong
+##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
 sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1000,nb.perm.max=1000000,nb.perm.max.svQTL=1e4,svQTL=FALSE,approx=TRUE, verbose=TRUE){
 
@@ -64,23 +64,26 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
 
   ## Check if:
   ## - less than 3 missing genotype values
-  ## - more than 5 samples per genotype group
+  ## - more than 10 samples per genotype group
   ## - more than 5 different splicing pts per genotype group
   ## Return: TRUE if snp passed, FALSE if not.
   check.genotype <- function(geno.df, tre.df){
     apply(geno.df, 1, function(geno.snp){
-      if(sum(as.numeric(geno.snp)==-1)>2){
+      if(sum(as.numeric(geno.snp) == -1) > 2){
         return("Missing genotype")
       }
-      geno.snp.t = table(geno.snp[geno.snp>-1])
-      if(sum(geno.snp.t >= 5) < 2){
-        return("One group of >5 samples")
+      geno.snp.t <- table(geno.snp[geno.snp > -1])
+      if (length(geno.snp.t) < 2) {
+        return("Only one genotype group")                    
       }
-      nb.diff.pts = sapply(names(geno.snp.t)[geno.snp.t>1], function(geno.i){
-        nbDiffPt(tre.df[,which(geno.snp==geno.i)])
+      if (sum(geno.snp.t >= 10) < length(geno.snp.t)) {
+        return("Not all the groups with >10 samples")        
+      }
+      nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
+        nbDiffPt(tre.df[, which(geno.snp == geno.i)])
       })
       if(sum(nb.diff.pts >= 5) < 2){
-        return("One group of >5 different splicing")
+        return("Only one group of >5 different splicing")
       }
       return("PASS")
     })
@@ -99,6 +102,9 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
       ## Focus on common samples
       genotype.headers = as.character(utils::read.table(genotype.f, as.is=TRUE, nrows=1))
       com.samples = intersect(colnames(tre.gene),genotype.headers)
+      if(length(com.samples) == 0){
+        stop("No common samples between genotype and transcript expression files")
+      }
       tre.dist = hellingerDist(tre.gene[,com.samples])
 
       res.df = data.frame()
