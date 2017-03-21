@@ -6,7 +6,7 @@
 \usage{
 sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
   min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE,
+  nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
   verbose = TRUE)
 }
 \arguments{
@@ -23,7 +23,7 @@ Must have column 'snpId'.}
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
 \item{min.nb.ext.scores}{the minimum number of permuted score higher than
-the highest true score to allow the computation to stop. Default is 1000.}
+the highest true score to allow the computation to stop. Default is 1e3.}
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1e6.}
 
@@ -34,6 +34,9 @@ computation of svQTLs cannot rely on asymptotic approximation, hence the heavy p
 considerably increase the running time.}
 
 \item{approx}{should the asymptotic distribution be used instead of permutations.
+Default is TRUE.}
+
+\item{qform}{should \code{CompQuadForm::Davies} be used to compute analytical P-values. This requires \code{approx = TRUE} 
 Default is TRUE.}
 
 \item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
@@ -68,15 +71,17 @@ filters remove SNP with :
 Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
 in these groups. Testing this assumption is more complex and computationnally intensive but if needed the user
 can choose to test for svQTL (splicing variability QTL), i.e. gene/SNPs where this assumption is violated,
-by using the \code{svQTL=TRUE}. This test is run in parallel to the sQTL tests, but the computation time
+by using the \code{svQTL = TRUE}. This test is run in parallel to the sQTL tests, but the computation time
 will be considerably higher. For this reason, another parameter can be tweaked, \code{nb.perm.max.svQTL},
-to reduce the number of permutation for the svQTL tests if needed for feasibility reasons.
+to reduce the number of permutations for the svQTL tests if needed for feasibility reasons.
 
 The permutation process is optimized by computing one permuted distribution per gene and using a number
-of permutation depending on how extreme the true scores are compared to the permuted ones. To decrease
+of permutations dependant on how extreme are the observed scores when compared to the permuted ones. To decrease
 even more the computation time, an approximation of the null F distribution was given by Anderson &
-Robinson (2003), as a misture of Chi-square distributions whoose parameters are derived from the eigen
+Robinson (2003), as a misture of Chi-square distributions whose parameters are derived from the eigen
 values of the distance matrix.
+
+HERE ADD THEORY ABOUT CompQuadForm and Adaptative permutation/MC. Also check the former
 
 In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2

@@ -14,15 +14,17 @@
 ##' Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
 ##' in these groups. Testing this assumption is more complex and computationnally intensive but if needed the user
 ##' can choose to test for svQTL (splicing variability QTL), i.e. gene/SNPs where this assumption is violated,
-##' by using the \code{svQTL=TRUE}. This test is run in parallel to the sQTL tests, but the computation time
+##' by using the \code{svQTL = TRUE}. This test is run in parallel to the sQTL tests, but the computation time
 ##' will be considerably higher. For this reason, another parameter can be tweaked, \code{nb.perm.max.svQTL},
-##' to reduce the number of permutation for the svQTL tests if needed for feasibility reasons.
+##' to reduce the number of permutations for the svQTL tests if needed for feasibility reasons.
 ##'
 ##' The permutation process is optimized by computing one permuted distribution per gene and using a number
-##' of permutation depending on how extreme the true scores are compared to the permuted ones. To decrease
+##' of permutations dependant on how extreme are the observed scores when compared to the permuted ones. To decrease
 ##' even more the computation time, an approximation of the null F distribution was given by Anderson &
-##' Robinson (2003), as a misture of Chi-square distributions whoose parameters are derived from the eigen
-##' values of the distance matrix.
+##' Robinson (2003), as a misture of Chi-square distributions whose parameters are derived from the eigen
+##' values of the distance matrix. 
+##' 
+##' HERE ADD THEORY ABOUT CompQuadForm and Adaptative permutation/MC. Also check the former
 ##'
 ##' In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 ##' groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2
@@ -37,13 +39,15 @@
 ##' 'end' and 'geneId' are required.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
-##' the highest true score to allow the computation to stop. Default is 1000.
+##' the highest true score to allow the computation to stop. Default is 1e3.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1e6.
 ##' @param nb.perm.max.svQTL the maximum number of permutations for the svQTL computation. Default is 1e4.
 ##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
 ##' computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 ##' considerably increase the running time.
 ##' @param approx should the asymptotic distribution be used instead of permutations.
+##' Default is TRUE.
+##' @param qform should \code{CompQuadForm::Davies} be used to compute analytical P-values. This requires \code{approx = TRUE} 
 ##' Default is TRUE.
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns
@@ -58,7 +62,7 @@
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1000,nb.perm.max=1000000,nb.perm.max.svQTL=1e4,svQTL=FALSE,approx=TRUE, verbose=TRUE){
+sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3,nb.perm.max=1e6,nb.perm.max.svQTL=1e4,svQTL=FALSE,approx=TRUE, qform = TRUE, verbose=TRUE){
 
   . = nb.groups = snpId = NULL ## Uglily appease R checks (dplyr)
 
@@ -120,67 +124,56 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
       } else {
           gr.gene.spl <- gr.gene
       }
-######################################################################### working here
-      res.df = lapply(1:length(gr.gene.spl), function(ii){
-        res.range = data.frame()
-        if(verbose){message("  Sub-range ",ii)}
-        genotype.gene = read.bedix(genotype.f, gr.gene.spl[ii])
-        if(verbose & is.null(genotype.gene)){message("    No SNPs in the genomic range.")}
+
+      res.df <- lapply(1:length(gr.gene.spl), function(ii){
+        res.range <- data.frame()
+        if(verbose){message("  Sub-range ", ii)}
+        genotype.gene <- read.bedix(genotype.f, gr.gene.spl[ii])
+        if(verbose & is.null(genotype.gene)){message("\tNo SNPs in the genomic range.")}
         if(!is.null(genotype.gene)){
-          ## Filter SNP with not enough power
-          snps.to.keep = check.genotype(genotype.gene[,com.samples], tre.gene[,com.samples])
+          ## Filter out SNPs with not enough power
+          snps.to.keep <- check.genotype(genotype.gene[,com.samples], tre.gene[, com.samples])
           if(verbose){
-            snps.to.keep.t = table(snps.to.keep)
-            message("    ",paste(names(snps.to.keep.t), snps.to.keep.t,sep=":",collapse=", "))
+            snps.to.keep.t <- table(snps.to.keep)
+            message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse=", "))
           }
-          if(any(snps.to.keep=="PASS")){
+          if(any(snps.to.keep == "PASS")){
             genotype.gene = genotype.gene[snps.to.keep=="PASS", ]
-            res.range = dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL=svQTL))
-            ## res.df = lapply(unique(genotype.gene$snpId), function(snpId){
-            ##   data.frame(snpId=snpId, compFscore(genotype.gene[which(genotype.gene$snpId==snpId),], tre.dist, tre.gene, svQTL=svQTL))
-            ## })
-            ## res.df = plyr::ldply(res.df)
+            res.range = dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
           }
         }
         return(res.range)
       })
-      range.done = which(unlist(lapply(res.df, nrow))>0)
+      range.done <- which(unlist(lapply(res.df, nrow)) > 0)
 
-      if(length(range.done)>0){
-        res.df = res.df[range.done]
-        res.df = do.call(rbind, res.df)
-        res.df = dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, approx=approx, min.nb.ext.scores=min.nb.ext.scores, nb.perm.max=nb.perm.max))
-        if(svQTL){
-          res.df = dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL=TRUE, min.nb.ext.scores=min.nb.ext.scores, nb.perm.max=nb.perm.max.svQTL))
+      if(length(range.done) > 0){
+        res.df <- res.df[range.done]
+        res.df <- do.call(rbind, res.df)
+        if(!qform){
+          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, approx = approx, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
         }
-        ## res.df = lapply(unique(res.df$nb.groups), function(nbgp.i){
-        ##   res.f = res.df[which(res.df$nb.groups==nbgp.i),]
-        ##   res.f = compPvalue(res.f, tre.dist, approx=approx, min.nb.ext.scores=min.nb.ext.scores, nb.perm.max=nb.perm.max)
-        ##   if(svQTL){
-        ##     res.f = compPvalue(res.f, tre.dist, svQTL=TRUE, min.nb.ext.scores=min.nb.ext.scores, nb.perm.max=nb.perm.max.svQTL)
-        ##   }
-        ##   res.f
-        ## })
-        ## res.df = plyr::ldply(res.df)
-        return(data.frame(done=TRUE,res.df))
+        if(svQTL){
+          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
+        }
+        return(data.frame(done = TRUE, res.df))
       }
     } else {
       if(verbose){
         warning("Issue with the gene location.")
       }
     }
-    return(data.frame(done=FALSE))
+    return(data.frame(done = FALSE))
   }
 
-  ret.df = lapply(unique(tre.df$geneId), function(gene.i){
-    df = tre.df[which(tre.df$geneId==gene.i),]
-    data.frame(geneId=gene.i, analyze.gene.f(df))
+  ret.df <- lapply(unique(tre.df$geneId), function(gene.i){
+    df <- tre.df[which(tre.df$geneId == gene.i), ]
+    data.frame(geneId = gene.i, analyze.gene.f(df))
   })
-  done = which(unlist(lapply(ret.df, ncol))>2)
-  if(length(done)>0){
-    ret.df = ret.df[done]
-    ret.df = do.call(rbind, ret.df)
-    ret.df$done=NULL
+  done <- which(unlist(lapply(ret.df, ncol)) > 2)
+  if(length(done) > 0){
+    ret.df <- ret.df[done]
+    ret.df <- do.call(rbind, ret.df)
+    ret.df$done <- NULL
     return(ret.df)
   } else {
     return(NULL)
