@@ -32,4 +32,3 @@ Compute F score using the \code{vegan} package.
 Jean Monlong
 }
 \keyword{internal}
-

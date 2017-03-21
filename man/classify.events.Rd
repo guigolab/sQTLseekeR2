@@ -44,4 +44,3 @@ classify.events(tr.df, tr.str)
 \author{
 Jean Monlong
 }
-

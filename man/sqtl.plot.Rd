@@ -37,4 +37,3 @@ The format of the transcript structure 'tr.str' should be : 'transId' the transc
 \author{
 Jean Monlong
 }
-

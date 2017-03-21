@@ -4,20 +4,19 @@
 \alias{te.dispersion}
 \title{Dispersion computation}
 \usage{
-te.dispersion(d)
+te.dispersion(tr)
 }
 \arguments{
-\item{d}{a distance matrix with pairwise distance between the samples.}
+\item{tr}{a transcript expression matrix}
 }
 \value{
 a value for the dispersion
 }
 \description{
-Compute the dispersion from a distance matrix. The dispersion is computed as
-the average distance to the centroid.
+Compute the dispersion from the transcript expression matrix. 
+Dispersion is computed as the mean Hellinger distance to the centroid.
 }
 \author{
-Jean Monlong
+Diego Garrido-Martín
 }
 \keyword{internal}
-

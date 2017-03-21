@@ -21,4 +21,3 @@ splicing ratios, the permutation might create many identical permuted F scores.
 Jean Monlong
 }
 \keyword{internal}
-

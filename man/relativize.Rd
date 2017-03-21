@@ -23,4 +23,3 @@ Compute the relative expression of transcripts.
 Jean Monlong
 }
 \keyword{internal}
-

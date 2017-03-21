@@ -28,11 +28,11 @@ a data.frame with the relative transcript expression for the
 genes to study.
 }
 \description{
-Prepare the transcript expression matrix. Transcript with low
-expression are removed. Then gene expressing only one transcript
-are removed because not informative for splicing analysis. Finally
+Prepare the transcript expression matrix. Transcripts with low
+expression are removed. Genes expressing only one transcript
+are removed because they are not informative for splicing analysis. Finally
 the relative expression of the transcripts is retrieved and genes with
-low dispersion are removed. Also genes with just a few (<25)
+low dispersion are removed. Also genes with a small number (<25) of
 different splicing patterns are removed as they don't fit the
 permutation process.
 }
@@ -42,6 +42,5 @@ relative expression is computed by dividing its expression
 by the total expression of all transcripts for the gene.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
-

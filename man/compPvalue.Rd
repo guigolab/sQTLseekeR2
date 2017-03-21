@@ -32,4 +32,3 @@ Compute P-values from F scores.
 Jean Monlong
 }
 \keyword{internal}
-

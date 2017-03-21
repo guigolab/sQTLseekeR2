@@ -13,9 +13,9 @@ Date: \tab 2017-20-03\cr
 License: \tab GPL-2\cr
 }
 }
-\author{Diego Garrido, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigo.
+\author{Diego Garrido-Martín, Jean Monlong, Ferran Reverter, Miquel Calvo, Roderic Guigo.
 
-Maintainer: Diego Garrido <dgarrimar@gmail.com>}
+Maintainer: Diego Garrido-Martín <dgarrimar@gmail.com>}
 \references{Monlong, J. et al. Identification of genetic variants associated with alternative splicing using sQTLseekeR. Nat. Commun. 5:4698 doi: 10.1038/ncomms5698 (2014).}
 \keyword{splicing, qtl, rna-seq, sequencing, transcriptome}
 \examples{

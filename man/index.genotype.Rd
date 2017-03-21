@@ -22,4 +22,3 @@ mut/mut and -1 for missing values. The input file should be a text file.
 \author{
 Jean Monlong
 }
-

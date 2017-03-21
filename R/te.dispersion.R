@@ -1,18 +1,18 @@
-##' Compute the dispersion from a distance matrix. The dispersion is computed as
-##' the average distance to the centroid.
+##' Compute the dispersion from the transcript expression matrix. 
+##' Dispersion is computed as the mean Hellinger distance to the centroid.
 ##' @title Dispersion computation
-##' @param d a distance matrix with pairwise distance between the samples.
+##' @param tr a transcript expression matrix 
 ##' @return a value for the dispersion
-##' @author Jean Monlong
+##' @author Diego Garrido-Martín
 ##' @keywords internal
-te.dispersion <-  function(d){
-    if(class(d) != "dist"){
-        if(any(na.ind <- is.na(diag(d)))){
-            d = d[!na.ind,!na.ind]
-        }
-        d = stats::as.dist(d)
-    }
-    bd = tryCatch(vegan::betadisper(d,rep(1,ncol(as.matrix(d)))),
-        error = function(e)return(list(distances=0)))
-    return(mean(bd$distances))
+
+te.dispersion = function (tr) {
+  hellingerDist.p <- function(x1, x2) {
+    a <- (sqrt(x1) - sqrt(x2))
+    b <- sqrt(sum(a * a))
+    return(b)
+  }
+  c <- as.numeric(apply(tr, 1, function(x)(mean(x, na.rm=T))))         
+  d <- mean(apply(tr, 2, function(x)(hellingerDist.p(x, c))), na.rm=T)  
+  return(d)
 }

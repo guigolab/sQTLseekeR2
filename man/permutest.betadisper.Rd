@@ -27,4 +27,3 @@ The older version of 'permutest.betadisper' which returned the permuted F scores
 Jean Monlong
 }
 \keyword{internal}
-

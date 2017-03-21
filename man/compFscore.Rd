@@ -29,4 +29,3 @@ Compute the F score, max diff ratio difference.
 Jean Monlong
 }
 \keyword{internal}
-

@@ -43,4 +43,3 @@ are removed from the final set of significant sQTLs.
 \author{
 Jean Monlong
 }
-
