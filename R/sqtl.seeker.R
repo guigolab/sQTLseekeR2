@@ -91,36 +91,36 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
 
   analyze.gene.f <- function(tre.gene){
     if(verbose) message(tre.gene$geneId[1])
-    ## Load genotype
-    gr.gene = with(gene.loc[which(gene.loc$geneId==tre.gene$geneId[1]),], GenomicRanges::GRanges(chr, IRanges::IRanges(start, end)))
-    if(genic.window>0){
-      gr.gene = GenomicRanges::resize(gr.gene, GenomicRanges::width(gr.gene)+2*genic.window, fix="center")
+    if(sum(duplicated(gene.loc$geneId)) > 1){
+      stop(tre.gene$geneId[1], " Repeated gene in gene location file.")
     }
-    if(length(gr.gene)>0){
+    ## Load genotype
+    gr.gene <- with(gene.loc[which(gene.loc$geneId == tre.gene$geneId[1]), ], GenomicRanges::GRanges(chr, IRanges::IRanges(start, end)))
+    if(genic.window > 0){
+      gr.gene <- GenomicRanges::resize(gr.gene, GenomicRanges::width(gr.gene) + 2 * genic.window, fix = "center")
+    }
+    if(length(gr.gene) > 0){
       ## Remove samples with non expressed genes
-      tre.gene = tre.gene[,!is.na(tre.gene[1,])]
+      tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
       ## Focus on common samples
-      genotype.headers = as.character(utils::read.table(genotype.f, as.is=TRUE, nrows=1))
-      com.samples = intersect(colnames(tre.gene),genotype.headers)
+      genotype.headers <- as.character(utils::read.table(genotype.f, as.is = TRUE, nrows = 1))
+      com.samples <- intersect(colnames(tre.gene), genotype.headers)
       if(length(com.samples) == 0){
         stop("No common samples between genotype and transcript expression files")
       }
-      tre.dist = hellingerDist(tre.gene[,com.samples])
-
-      res.df = data.frame()
-      gr.gene.spl = gr.gene
-      if(any(GenomicRanges::width(gr.gene)>2e4)){
-        gr.gene.spl = gr.gene[which(GenomicRanges::width(gr.gene)<=2e4)]
-        for(ii in unique(which(GenomicRanges::width(gr.gene)>2e4))){
-          pos.breaks = unique(round(seq(GenomicRanges::start(gr.gene[ii]), GenomicRanges::end(gr.gene[ii]),length.out=floor(GenomicRanges::width(gr.gene[ii])/1e4)+1)))
-          gr.gene.spl.ii = rep(gr.gene[ii], length(pos.breaks)-1)
-          GenomicRanges::start(gr.gene.spl.ii) = pos.breaks[-length(pos.breaks)]
-          pos.breaks[length(pos.breaks)] = pos.breaks[length(pos.breaks)]+1
-          GenomicRanges::end(gr.gene.spl.ii) = pos.breaks[-1]-1
-          gr.gene.spl = c(gr.gene.spl, gr.gene.spl.ii)
-        }
+      tre.dist <- hellingerDist(tre.gene[, com.samples])
+      res.df <- data.frame()
+      
+      if(GenomicRanges::width(gr.gene) > 2e4){
+          pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), GenomicRanges::end(gr.gene), length.out = floor(GenomicRanges::width(gr.gene)/1e4) + 1)))
+          gr.gene.spl <- rep(gr.gene, length(pos.breaks) - 1)
+          GenomicRanges::start(gr.gene.spl) <- pos.breaks[-length(pos.breaks)]
+          pos.breaks[length(pos.breaks)] <- pos.breaks[length(pos.breaks)] + 1
+          GenomicRanges::end(gr.gene.spl) <- pos.breaks[-1] - 1
+      } else {
+          gr.gene.spl <- gr.gene
       }
-
+######################################################################### working here
       res.df = lapply(1:length(gr.gene.spl), function(ii){
         res.range = data.frame()
         if(verbose){message("  Sub-range ",ii)}

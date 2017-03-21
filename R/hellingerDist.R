@@ -21,7 +21,7 @@ hellingerDist <- function(sr){
     }
     interdist <- interdist + t(interdist)
     colnames(interdist) <- rownames(interdist) <- colnames(sr)
-    non.na <- !is.na(diag(interdist))
+    non.na <- !is.na(diag(interdist))                           
     interdist <- interdist[non.na, non.na]
     return(stats::as.dist(interdist))
 }

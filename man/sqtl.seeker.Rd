@@ -62,7 +62,7 @@ A set of filters is automatically used to remove SNPs which are unpractical or n
 filters remove SNP with :
 \itemize{
 \item{more than 3 unknown genotypes}
-\item{less than 5 samples in any genotype group}
+\item{less than 10 samples in any genotype group}
 \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 
 Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
@@ -83,5 +83,5 @@ groups is reported. This is to be used as a measure of the size of the effect. F
 there is one transcript whose relative expression shifted by 20 percent between two genotype groups.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
