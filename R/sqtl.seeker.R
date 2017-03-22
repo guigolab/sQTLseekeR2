@@ -64,7 +64,7 @@
 ##' @export
 sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3,nb.perm.max=1e6,nb.perm.max.svQTL=1e4,svQTL=FALSE,approx=TRUE, qform = TRUE, verbose=TRUE){
 
-  . = nb.groups = snpId = NULL ## Uglily appease R checks (dplyr)
+  . <- nb.groups <- snpId = NULL ## Uglily appease R checks (dplyr)
 
   ## Check if:
   ## - less than 3 missing genotype values
@@ -138,8 +138,8 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
             message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse=", "))
           }
           if(any(snps.to.keep == "PASS")){
-            genotype.gene = genotype.gene[snps.to.keep=="PASS", ]
-            res.range = dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
+            genotype.gene <- genotype.gene[snps.to.keep == "PASS", ]
+            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
           }
         }
         return(res.range)
@@ -165,6 +165,11 @@ sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ex
     return(data.frame(done = FALSE))
   }
 
+  if(!approx & qform) {
+    warning("'qform' is ignored when 'approx' = FALSE. Type ?sqtl.seeker for more details.")
+    qform <- FALSE
+  }
+  
   ret.df <- lapply(unique(tre.df$geneId), function(gene.i){
     df <- tre.df[which(tre.df$geneId == gene.i), ]
     data.frame(geneId = gene.i, analyze.gene.f(df))

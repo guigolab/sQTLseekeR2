@@ -8,7 +8,7 @@ read.bedix(file, subset.reg = NULL, header = TRUE, as.is = TRUE)
 }
 \arguments{
 \item{file}{the name of the file which the data are to be read from.
-Should be compressed with |code{bgzip} and indexed by tabix algorithm.}
+Should be compressed with \code{bgzip} and indexed by tabix algorithm.}
 
 \item{subset.reg}{a data.frame or GRanges object with the regions to subset from.
 If a data.frame, it must have columns named 'chr', 'start' and 'end'.}
@@ -27,5 +27,5 @@ Using \code{Rsamtools} functions to manipulate tabix file, the indexed BED file 
 and only regions defined by the desired subset are retrieved.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
