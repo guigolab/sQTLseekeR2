@@ -5,8 +5,8 @@
 ##' @param tre.dist a distance object from the transcript relative expression.
 ##' @param tre.df a data.frame with the transcript relative expression. 
 ##' @param svQTL should svQTL test be performed in addition to sQTL. Default is FALSE.
-##' @param qform should significance for the F score (sQTL test) be computed using \code{davies} method in
-##' the \code{CompQuadForm} package?. Default is TRUE.
+##' @param qform should significance for the F score (sQTL test) be computed using 
+##' the \code{CompQuadForm::davies} method in the \code{CompQuadForm} package?. Default is TRUE.
 ##' @return a data.frame with columns:
 ##' \item{F}{the F score.}
 ##' \item{nb.groups}{the number of groups created by the genotypes.}

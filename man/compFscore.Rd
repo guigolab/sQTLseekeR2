@@ -15,8 +15,8 @@ compFscore(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE)
 
 \item{svQTL}{should svQTL test be performed in addition to sQTL. Default is FALSE.}
 
-\item{qform}{should significance for the F score (sQTL test) be computed using \code{davies} method in
-the \code{CompQuadForm} package?. Default is TRUE.}
+\item{qform}{should significance for the F score (sQTL test) be computed using 
+the \code{CompQuadForm::davies} method in the \code{CompQuadForm} package?. Default is TRUE.}
 }
 \value{
 a data.frame with columns:
