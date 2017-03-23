@@ -45,7 +45,7 @@
 ##' considerably increase the running time.
 ##' @param approx should the asymptotic distribution be used instead of permutations.
 ##' Default is TRUE.
-##' @param qform should \code{\link[CompQuadForm]{Davies}} function in the \code{CompQuadForm} package be 
+##' @param qform should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
 ##' used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
 ##' but slightly increases the computation time. Default is TRUE.
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
