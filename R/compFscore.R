@@ -62,35 +62,35 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
     D <- as.matrix(tre.dist)
     colnames(D) <- rownames(D) <- NULL
     G <- gower(D)
+    X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f), contrasts.arg = list("genotype" = "contr.sum"))     
     p <- ncol(X) - 1
     n <- nrow(X)
     H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
-    X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f), contrasts.arg = list("genotype" = "contr.sum"))     
     vh <- c(H)                                                                    
     vg <- c(G)
     numer <- crossprod(vh, vg)
     trG <- sum(diag(G))
     denom <- trG - numer                                                          
-    F.snp <- as.numeric(numer/denom)                                                  
+    f.snp <- as.numeric(numer/denom)                                                  
     lambda <- eigen(G, only.values = T)$values                                    
     lambda <- abs(lambda[abs(lambda) > 1e-12 ])                                     
     start.acc <- 1e-14   
     item.acc <- start.acc
-    pv.snp <- pmdmr(q = F.snp, lambda = lambda, k = p, p = p, n = n, acc = start.acc)     
+    pv.snp <- pcqf(q = f.snp, lambda = lambda, k = p, p = p, n = n, acc = start.acc)     
     while (length(pv.snp) > 1) {                                                      
       item.acc <- item.acc * 10
-      pv.snp <- pcqf(q = F.snp, lambda = lambda, k = p, p = p, n = n, acc = item.acc)  
+      pv.snp <- pcqf(q = f.snp, lambda = lambda, k = p, p = p, n = n, acc = item.acc)  
     }
     if(pv.snp < item.acc) {
       pv.snp <- item.acc
     }
-    res.df <- data.frame(F = F.snp,
+    res.df <- data.frame(F = f.snp * (n - p - 1) / p,  
                          nb.groups = nlevels(groups.snp.f),
                          md = mdt$md,
                          tr.first = mdt$tr.first,
                          tr.second = mdt$tr.second,
                          pv = pv.snp,
-                         stringsAsFactors = FALSE)
+                         stringsAsFactors = FALSE) # Here note that p = df(factor) - 1
   }else{
     F.snp <- adonis.comp(tre.dist, groups.snp.f, permutations = 2, svQTL = FALSE)
     res.df <- data.frame(F = F.snp,
