@@ -58,7 +58,7 @@
 ##' \item{md}{the maximum difference in relative expression between genotype groups (see Details)}
 ##' \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
 ##' \item{pv}{the P-value}
-##' \item{nb.perms}{the number of permutation used for the P-value computation}
+##' \item{nb.perms}{the number of permutations (Monte Carlo generations if \code{approx = TRUE}) used for the P-value computation}
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
