@@ -36,7 +36,7 @@ considerably increase the running time.}
 \item{approx}{should the asymptotic distribution be used instead of permutations.
 Default is TRUE.}
 
-\item{qform}{should \code{\link[CompQuadForm]{Davies}} function in the \code{CompQuadForm} package be 
+\item{qform}{should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
 used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
 but slightly increases the computation time. Default is TRUE.}
 
@@ -51,7 +51,7 @@ a data.frame with columns
 \item{md}{the maximum difference in relative expression between genotype groups (see Details)}
 \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
 \item{pv}{the P-value}
-\item{nb.perms}{the number of permutations (Monte Carlo generations if \code{approx = TRUE}) used for the P-value computation}
+\item{nb.perms}{the number of permutations used for the P-value computation}
 \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 }
 \description{
