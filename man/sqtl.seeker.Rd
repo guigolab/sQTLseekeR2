@@ -36,8 +36,9 @@ considerably increase the running time.}
 \item{approx}{should the asymptotic distribution be used instead of permutations.
 Default is TRUE.}
 
-\item{qform}{should \code{CompQuadForm::Davies} be used to compute analytical P-values. This requires \code{approx = TRUE} 
-Default is TRUE.}
+\item{qform}{should \code{\link[CompQuadForm]{Davies}} function in the \code{CompQuadForm} package be 
+used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
+but slightly increases the computation time. Default is TRUE.}
 
 \item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
 }
@@ -58,11 +59,11 @@ a data.frame with columns
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
 file, indexed by function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
-potential false sQTL (see Details).
+potentially false sQTL (see Details).
 }
 \details{
-A set of filters is automatically used to remove SNPs which are unpractical or not informative. Precisely, these
-filters remove SNP with :
+A set of filters is automatically set to remove SNPs which are unpractical or not informative. Precisely, these
+filters remove SNP with:
 \itemize{
 \item{more than 3 unknown genotypes}
 \item{less than 10 samples in any genotype group}
@@ -80,8 +81,6 @@ of permutations dependant on how extreme are the observed scores when compared t
 even more the computation time, an approximation of the null F distribution was given by Anderson &
 Robinson (2003), as a misture of Chi-square distributions whose parameters are derived from the eigen
 values of the distance matrix.
-
-HERE ADD THEORY ABOUT CompQuadForm and Adaptative permutation/MC. Also check the former
 
 In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2
