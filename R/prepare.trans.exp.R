@@ -24,8 +24,8 @@
 ##' genes to study.
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-prepare.trans.exp <- function(te.df, min.transcript.exp=.01,min.gene.exp=.01, min.dispersion=.1, verbose=FALSE){
-  if(!all(c("geneId","trId") %in% colnames(te.df))){
+prepare.trans.exp <- function(te.df, min.transcript.exp = .01,min.gene.exp = .01, min.dispersion = .1, verbose = FALSE){
+  if(!all(c("geneId", "trId") %in% colnames(te.df))){
     stop("Missing column in 'te.df' : 'geneId' and 'trId' are required.")
   }
 
@@ -34,31 +34,31 @@ prepare.trans.exp <- function(te.df, min.transcript.exp=.01,min.gene.exp=.01, mi
   te.df$trId <- as.character(te.df$trId)
   ##
 
-  samples <- setdiff(colnames(te.df), c("chr","start","end","geneId","trId"))
-  if(length(samples)<5){
+  samples <- setdiff(colnames(te.df), c("chr", "start", "end", "geneId", "trId"))
+  if(length(samples) < 5){
     stop("Not enough samples; at least 5 samples required (although at least 20 is recommended).")
   }
-  if(length(samples)<20){
+  if(length(samples) < 20){
     warning("Low sample size : it's recommended to have at least 20 samples.")
   }
-  trans.to.keep = apply(te.df[,samples],1,function(r)any(r>min.transcript.exp))
+  trans.to.keep <- apply(te.df[, samples], 1, function(r) any(r > min.transcript.exp))
   if(all(!trans.to.keep)){
     stop("No transcripts with expression above threshold")
   }
   if(verbose & any(!trans.to.keep)){
-    message("Filtered transcripts : ", paste(te.df$trId[which(!trans.to.keep)],collapse=" "))
+    message("Filtered transcripts : ", paste(te.df$trId[which(!trans.to.keep)], collapse = " "))
   }
-  te.df <- te.df[which(trans.to.keep),]
+  te.df <- te.df[which(trans.to.keep), ]
   nb.trans <- table(te.df$geneId)
-  trans2 <- names(which(nb.trans>1))
-  if(verbose & any(nb.trans<=1)){
-    message("Filtered single-transcript genes : ", paste(setdiff(unique(te.df$geneId),trans2),collapse=" "))
+  trans2 <- names(which(nb.trans > 1))
+  if(verbose & any(nb.trans <= 1)){
+    message("Filtered single-transcript genes : ", paste(setdiff(unique(te.df$geneId), trans2), collapse = " "))
   }
-  te.df <- te.df[which(te.df$geneId %in% trans2),]
+  te.df <- te.df[which(te.df$geneId %in% trans2), ]
   
   relativize.filter.dispersion <- function(df) {
     df[, samples] <- apply(df[, samples], 2, relativize, min.gene.exp = min.gene.exp)
-    disp <- te.dispersion(df[,samples])
+    disp <- te.dispersion(df[, samples])
     if (disp > min.dispersion & nbDiffPt(df[, samples]) >                  
         min(25, length(samples) * 0.8)){
       return(df)
@@ -67,15 +67,15 @@ prepare.trans.exp <- function(te.df, min.transcript.exp=.01,min.gene.exp=.01, mi
   }
 
   te.df <- plyr::ldply(lapply(unique(te.df$geneId), function(gene.i){
-    df <- te.df[which(te.df$geneId==gene.i), ]
+    df <- te.df[which(te.df$geneId == gene.i), ]
     relativize.filter.dispersion(df)
   }), identity)
 
-  if(verbose & length(unique(te.df$geneId))!=length(trans2)){
-    message("Filtered low exp/disp genes : ", paste(setdiff(trans2,unique(te.df$geneId)),collapse=" "))
+  if(verbose & length(unique(te.df$geneId)) != length(trans2)){
+    message("Filtered low exp/disp genes : ", paste(setdiff(trans2,unique(te.df$geneId)), collapse = " "))
   }
 
-  if(nrow(te.df)==0){
+  if(nrow(te.df) == 0){
     stop("No genes found with suitable transcript expression.")
   }
 

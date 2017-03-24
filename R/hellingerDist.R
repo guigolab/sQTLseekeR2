@@ -9,19 +9,19 @@
 hellingerDist <- function(sr){
     hellingerDist.p <- function(x1, x2) {
         a <- (sqrt(x1) - sqrt(x2))
-        b <- sqrt(sum(a*a))  
+        b <- sqrt(sum(a * a))  
         return(b)
     }
     k <- dim(sr)[2]
-    interdist <- matrix(data=0,nrow=k,ncol=k)
+    interdist <- matrix(data = 0, nrow = k, ncol = k)
     for(i in 1:k) {
         for(j in 1:i) {
-                interdist[i,j] <- hellingerDist.p(sr[,i],sr[,j])          
+                interdist[i, j] <- hellingerDist.p(sr[, i], sr[, j])          
             }
     }
-    interdist = interdist + t(interdist)
-    colnames(interdist) = rownames(interdist) = colnames(sr)
-    non.na = !is.na(diag(interdist))
-    interdist = interdist[non.na, non.na]
+    interdist <- interdist + t(interdist)
+    colnames(interdist) <- rownames(interdist) <- colnames(sr)
+    non.na <- !is.na(diag(interdist))                           
+    interdist <- interdist[non.na, non.na]
     return(stats::as.dist(interdist))
 }
