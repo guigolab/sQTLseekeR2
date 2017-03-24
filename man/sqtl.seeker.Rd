@@ -62,7 +62,7 @@ expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variabilit
 potentially false sQTL (see Details).
 }
 \details{
-A set of filters is automatically set to remove SNPs which are unpractical or not informative. Precisely, these
+A set of filters is automatically set to remove SNPs which are unpractical or not informative (see also \code{\link{check.genotype}} function). Precisely, these
 filters remove SNP with:
 \itemize{
 \item{more than 3 unknown genotypes}

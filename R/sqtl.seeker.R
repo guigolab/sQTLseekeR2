@@ -4,7 +4,7 @@
 ##' expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
 ##' potentially false sQTL (see Details).
 ##'
-##' A set of filters is automatically set to remove SNPs which are unpractical or not informative. Precisely, these
+##' A set of filters is automatically set to remove SNPs which are unpractical or not informative (see also \code{\link{check.genotype}} function). Precisely, these
 ##' filters remove SNP with:
 ##' \itemize{
 ##' \item{more than 3 unknown genotypes}
@@ -64,33 +64,6 @@
 sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3, nb.perm.max=1e6, nb.perm.max.svQTL=1e4, svQTL=FALSE, approx=TRUE, qform = TRUE, verbose=TRUE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
-
-  ## Check if:
-  ## - less than 3 missing genotype values
-  ## - more than 10 samples per genotype group
-  ## - more than 5 different splicing pts per genotype group
-  ## Return: TRUE if snp passed, FALSE if not.
-  check.genotype <- function(geno.df, tre.df){
-    apply(geno.df, 1, function(geno.snp){
-      if(sum(as.numeric(geno.snp) == -1) > 2){
-        return("Missing genotype")
-      }
-      geno.snp.t <- table(geno.snp[geno.snp > -1])
-      if (length(geno.snp.t) < 2) {
-        return("Only one genotype group")                    
-      }
-      if (sum(geno.snp.t >= 10) < length(geno.snp.t)) {
-        return("Not all the groups with >10 samples")        
-      }
-      nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
-        nbDiffPt(tre.df[, which(geno.snp == geno.i)])
-      })
-      if(sum(nb.diff.pts >= 5) < 2){
-        return("Only one group of >5 different splicing")
-      }
-      return("PASS")
-    })
-  }
 
   analyze.gene.f <- function(tre.gene){
     if(verbose) message(tre.gene$geneId[1])
@@ -182,4 +155,39 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.e
   } else {
     return(NULL)
   }
+}
+
+##' Labels SNPs according to their suitability for sQTL mapping.  
+##' @title Check genotype
+##' @param geno.df a data.frame of genotypes produced by \code{\link{read.bedix}}.
+##' @param tre.df a data.frame with transcript relative expression values
+##' produced by \code{\link{prepare.trans.exp}} corresponding to one gene.
+##' @return A character vector of SNP suitabilities. Possible labels:
+##' \item{"Missing genotype" (more than 3 missing genotype values)}{ }
+##' \item{"Only one genotype group"}{ }
+##' \item{"Not all the groups with >10 samples"}{ }
+##' \item{"Not all the groups with >5 different splicing patterns"}{ }
+##' \item{"PASS"}{ }
+##' @author Jean Monlong, Diego Garrido-Martín 
+##' @keywords internal
+check.genotype <- function(geno.df, tre.df){
+  apply(geno.df, 1, function(geno.snp){
+    if(sum(as.numeric(geno.snp) == -1) > 2){
+      return("Missing genotype")
+    }
+    geno.snp.t <- table(geno.snp[geno.snp > -1])
+    if (length(geno.snp.t) < 2) {
+      return("Only one genotype group")                    
+    }
+    if (sum(geno.snp.t >= 10) < length(geno.snp.t)) {
+      return("Not all the groups with >10 samples")        
+    }
+    nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
+      nbDiffPt(tre.df[, which(geno.snp == geno.i)])
+    })
+    if(sum(nb.diff.pts >= 5) < length(geno.snp.t)){
+      return("Not all the groups with >5 different splicing patterns")
+    }
+    return("PASS")
+  })
 }
