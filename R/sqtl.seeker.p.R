@@ -109,27 +109,6 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
 compute.nominal.pv <- function(geno.df, tre.dist, permute = FALSE){
-  gower <- function (d.mat) {
-    ## d.mat <- as.matrix(d.mat)  # Differs from compFscore
-    n <- nrow(d.mat)
-    A <- -0.5 * d.mat^2
-    As <- A - rep(colMeans(A), rep.int(n, n))
-    return(t(As) - rep(rowMeans(As), rep.int(n, n)))
-  }
-  pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
-    gamma <- c(lambda, -q * lambda)                                               
-    nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
-    pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
-    if (pv$ifault != 0) {                                                        
-      return(pv)                                                                  
-    }                                                                             
-    if (pv$Qq < 0) {                                                              
-      return(pv)
-    }                                                                             
-    if (pv$ifault == 0) {
-      return(pv$Qq)                                    
-    }
-  } 
   if (nrow(geno.df) > 1) {
     stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
   } 
@@ -242,4 +221,26 @@ compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, 
   return(res.df)
 } 
 
+gower <- function (d.mat) {
+  d.mat <- as.matrix(d.mat)  
+  n <- nrow(d.mat)
+  A <- -0.5 * d.mat^2
+  As <- A - rep(colMeans(A), rep.int(n, n))
+  return(t(As) - rep(rowMeans(As), rep.int(n, n)))
+}
+
+pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
+  gamma <- c(lambda, -q * lambda)                                               
+  nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
+  pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
+  if (pv$ifault != 0) {                                                        
+    return(pv)                                                                  
+  }                                                                             
+  if (pv$Qq < 0) {                                                              
+    return(pv)
+  }                                                                             
+  if (pv$ifault == 0) {
+    return(pv$Qq)                                    
+  }
+} 
 
