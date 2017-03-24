@@ -60,16 +60,12 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
         return(pv$Qq)                                    
       }
     } 
-    D <- as.matrix(tre.dist)
-    colnames(D) <- rownames(D) <- NULL
-    G <- gower(D)
+    G <- gower(tre.dist)
     X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f), contrasts.arg = list("genotype" = "contr.sum"))     
     p <- ncol(X) - 1
     n <- nrow(X)
     H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
-    vh <- c(H)                                                                    
-    vg <- c(G)
-    numer <- crossprod(vh, vg)
+    numer <- crossprod(c(H), c(G))
     trG <- sum(diag(G))
     denom <- trG - numer                                                          
     f.snp <- as.numeric(numer/denom)                                                  

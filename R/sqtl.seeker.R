@@ -30,7 +30,7 @@
 ##' @title sQTL seeker
 ##' @param tre.df a data.frame with transcript relative expression
 ##' produced by 'prepare.trans.exp'.
-##' @param genotype.f the name of the genotype file. This file need to
+##' @param genotype.f the name of the genotype file. This file needs to
 ##' be ordered by position, compressed and indexed using 'index.genotype' or externally using tabix (samtools).
 ##' Must have column 'snpId'.
 ##' @param gene.loc a data.frame with the genes location. Columns 'chr', 'start',
@@ -61,7 +61,7 @@
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df,genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3,nb.perm.max=1e6,nb.perm.max.svQTL=1e4,svQTL=FALSE,approx=TRUE, qform = TRUE, verbose=TRUE){
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3, nb.perm.max=1e6, nb.perm.max.svQTL=1e4, svQTL=FALSE, approx=TRUE, qform = TRUE, verbose=TRUE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
 

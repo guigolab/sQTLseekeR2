@@ -13,7 +13,7 @@ sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
 \item{tre.df}{a data.frame with transcript relative expression
 produced by 'prepare.trans.exp'.}
 
-\item{genotype.f}{the name of the genotype file. This file need to
+\item{genotype.f}{the name of the genotype file. This file needs to
 be ordered by position, compressed and indexed using 'index.genotype' or externally using tabix (samtools).
 Must have column 'snpId'.}
 
