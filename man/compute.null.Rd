@@ -4,7 +4,7 @@
 \alias{compute.null}
 \title{F score null distribution}
 \usage{
-\method{compute}{null}(F.lead, dis, nb.gp, min.nb.ext.scores = 1000,
+compute.null(F.lead, dis, nb.gp, min.nb.ext.scores = 1000,
   nb.perm.max = 1e+06, svQTL = FALSE, approx = TRUE)
 }
 \arguments{

@@ -1,5 +1,5 @@
 ##' Retrieves sQTLs after multiple testing correction and svQTL removal (if requested).
-##' The distribution of the P-values and a semi-volcano plot can also be shown.
+##' The distribution of the P-values and a semi-volcano plot can be also displayed.
 ##'
 ##' Multiple testing correction can be performed using either Benjamini-Hochberg (\code{\link{p.adjust}} method) 
 ##' or Storey (\code{\link{qvalue}} method) approach for FDR. 
