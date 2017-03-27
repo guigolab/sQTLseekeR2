@@ -24,7 +24,7 @@
 ##' genes to study.
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-prepare.trans.exp <- function(te.df, min.transcript.exp = .01,min.gene.exp = .01, min.dispersion = .1, verbose = FALSE){
+prepare.trans.exp <- function(te.df, min.transcript.exp = 0.01,min.gene.exp = 0.01, min.dispersion = 0.1, verbose = FALSE){
   if(!all(c("geneId", "trId") %in% colnames(te.df))){
     stop("Missing column in 'te.df' : 'geneId' and 'trId' are required.")
   }
@@ -91,7 +91,7 @@ prepare.trans.exp <- function(te.df, min.transcript.exp = .01,min.gene.exp = .01
 ##' @return a vector with the relative expression.
 ##' @author Jean Monlong
 ##' @keywords internal
-relativize <- function(x, min.gene.exp = .01){
+relativize <- function(x, min.gene.exp = 0.01){
   x <- as.numeric(x)
   if (!any(is.na(x)) && sum(x) > min.gene.exp) {
     x/sum(x)

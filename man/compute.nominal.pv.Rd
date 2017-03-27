@@ -4,7 +4,7 @@
 \alias{compute.nominal.pv}
 \title{Compute nominal P-value}
 \usage{
-compute.nominal.pv(geno.df, tre.dist, permute = FALSE)
+\method{compute}{nominal.pv}(geno.df, tre.dist, permute = FALSE)
 }
 \arguments{
 \item{geno.df}{a data.frame of a single row corresponding to the genotype of one SNP 

@@ -11,7 +11,7 @@
 ##' @return a vector with the F score or the permuted F scores.
 ##' @author Jean Monlong
 ##' @keywords internal
-adonis.comp <- function(dis,groups,permutations=99,f.perms=FALSE,svQTL=FALSE,approx=TRUE){
+adonis.comp <- function(dis, groups, permutations = 99, f.perms = FALSE, svQTL = FALSE, approx = TRUE){
     if(svQTL){
         bd <- vegan::betadisper(dis, groups, type = "centroid")
         bd.perm <- permutest.betadisper(bd,control = permute::how(nperm = permutations)) 
@@ -40,9 +40,9 @@ adonis.comp <- function(dis,groups,permutations=99,f.perms=FALSE,svQTL=FALSE,app
                     dist <- as.matrix(dist)
                     e <- eigenG(dist)
                     n <- ncol(dist)
-                    eigenStats <- c(length (e), sum(e>0), sum(e<0))
+                    eigenStats <- c(length (e), sum(e > 0), sum(e < 0))
                     if (eigenStats[3]>0)  e <- abs(e) 
-                    randomChisqN <- matrix(stats::rchisq(nb.mont * eigenStats[1], df = nb.gp-1),
+                    randomChisqN <- matrix(stats::rchisq(nb.mont * eigenStats[1], df = nb.gp - 1),
                                            nrow = eigenStats[1], ncol = nb.mont)
                     randomChisqD <- matrix(stats::rchisq(nb.mont * eigenStats[1], df = n - nb.gp),
                                            nrow = eigenStats[1], ncol = nb.mont)

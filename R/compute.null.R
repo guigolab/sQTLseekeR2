@@ -14,7 +14,7 @@
 ##' \item{nbP.tot}{the number of permuted F scores.}
 ##' @author Jean Monlong
 ##' @keywords internal
-compute.null <- function(F.lead,dis,nb.gp,min.nb.ext.scores=1e3,nb.perm.max=1e6,svQTL=FALSE,approx=TRUE){
+compute.null <- function(F.lead,dis, nb.gp, min.nb.ext.scores = 1000, nb.perm.max = 1e6, svQTL = FALSE, approx = TRUE){
         
     estNbPerm <- function(pv,min.nb.ext.scores = 1000, nb.perm.max = 1e6){
         return(min(ceiling(min.nb.ext.scores/pv  + min.nb.ext.scores/10),nb.perm.max + min.nb.ext.scores/10))

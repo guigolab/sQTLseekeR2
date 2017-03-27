@@ -37,7 +37,7 @@
 ##' 'end' and 'geneId' are required.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
-##' the highest true score to allow the computation to stop. Default is 1e3.
+##' the highest true score to allow the computation to stop. Default is 1000.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1e6.
 ##' @param nb.perm.max.svQTL the maximum number of permutations for the svQTL computation. Default is 1e4.
 ##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
@@ -61,7 +61,7 @@
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3, nb.perm.max=1e6, nb.perm.max.svQTL=1e4, svQTL=FALSE, approx=TRUE, qform = TRUE, verbose=TRUE){
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window= 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, verbose = TRUE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
 

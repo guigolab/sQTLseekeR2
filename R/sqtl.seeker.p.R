@@ -31,7 +31,7 @@
 ##' @author Diego Garrido-Martín
 ##' @export
 ##' @import fitdistrplus
-sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e2, nb.perm.max=1e3, verbose=TRUE){
+sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = TRUE){
   
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
   
@@ -174,7 +174,7 @@ compute.nominal.pv <- function(geno.df, tre.dist, permute = FALSE){
 ##' \item{runtime}{approximated computation time per gene.}
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
-compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, min.nb.ext.scores = 1e2, nb.perm.max = 1e3, comp.ld = TRUE, verbose = FALSE){
+compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, min.nb.ext.scores = 100, nb.perm.max = 1000, comp.ld = TRUE, verbose = FALSE){
   if(comp.ld) {
     compute.ld <- function(df){
       M <- as.matrix(df)
@@ -217,7 +217,7 @@ compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, 
   t1 <- Sys.time()
   t.run <- as.numeric(difftime(t1, t0, units = "mins"))
   res.df <- data.frame(variants.cis = dim(genotype.gene)[1], LD = ld, best.snp = best.snp, best.nominal.pv = min.pv.obs, 
-                       shape1 = shape1, shape2 = shape2, nb.perms = length(store.perm), pv.emp = pv, pv.emp.beta = pv.beta,
+                       shape1 = shape1, shape2 = shape2, nb.perm = length(store.perm), pv.emp.perm = pv, pv.emp.beta = pv.beta,
                        runtime = t.run) 
   return(res.df)
 } 

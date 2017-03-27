@@ -23,7 +23,7 @@ Must have column 'snpId'.}
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
 \item{min.nb.ext.scores}{the minimum number of permuted score higher than
-the highest true score to allow the computation to stop. Default is 1e3.}
+the highest true score to allow the computation to stop. Default is 1000.}
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1e6.}
 
