@@ -39,27 +39,6 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
   groups.snp.f <- factor(as.numeric(geno.snp))
   mdt <- md.trans(tre.df, groups.snp.f, labels(tre.dist))
   if(qform){
-    gower <- function (d.mat) {
-      d.mat <- as.matrix(d.mat)
-      n <- nrow(d.mat)
-      A <- -0.5 * d.mat^2
-      As <- A - rep(colMeans(A), rep.int(n, n))
-      return(t(As) - rep(rowMeans(As), rep.int(n, n)))
-    }
-    pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
-      gamma <- c(lambda, -q * lambda)                                               
-      nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
-      pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
-      if (pv$ifault != 0) {                                                        
-        return(pv)                                                                  
-      }                                                                             
-      if (pv$Qq < 0) {                                                              
-        return(pv)
-      }                                                                             
-      if (pv$ifault == 0) {
-        return(pv$Qq)                                    
-      }
-    } 
     G <- gower(tre.dist)
     X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f), contrasts.arg = list("genotype" = "contr.sum"))     
     p <- ncol(X) - 1
@@ -102,3 +81,26 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
   }
   return(res.df)
 }
+
+gower <- function (d.mat) {
+  d.mat <- as.matrix(d.mat)
+  n <- nrow(d.mat)
+  A <- -0.5 * d.mat^2
+  As <- A - rep(colMeans(A), rep.int(n, n))
+  return(t(As) - rep(rowMeans(As), rep.int(n, n)))
+}
+
+pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
+  gamma <- c(lambda, -q * lambda)                                               
+  nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
+  pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
+  if (pv$ifault != 0) {                                                        
+    return(pv)                                                                  
+  }                                                                             
+  if (pv$Qq < 0) {                                                              
+    return(pv)
+  }                                                                             
+  if (pv$ifault == 0) {
+    return(pv$Qq)                                    
+  }
+} 

@@ -81,3 +81,46 @@ prepare.trans.exp <- function(te.df, min.transcript.exp = .01,min.gene.exp = .01
 
   return(te.df)
 }
+
+##' Compute the relative expression of transcripts.
+##' @title Relative expression computation
+##' @param x a vector with of transcript expression
+##' @param min.gene.exp the minimum gene expression in the sample. If the
+##' gene expression if too low it is usually safer to remove from the
+##' analysis.
+##' @return a vector with the relative expression.
+##' @author Jean Monlong
+##' @keywords internal
+relativize <- function(x, min.gene.exp = .01){
+  x <- as.numeric(x)
+  if (!any(is.na(x)) && sum(x) > min.gene.exp) {
+    x/sum(x)
+  } else {
+    return(rep(NA, length(x)))
+  }
+}
+
+##' Compute the dispersion from a gene's transcript expression matrix. 
+##' Dispersion is computed as the mean Hellinger distance to the centroid.
+##' @title Splicing dispersion computation
+##' @param tr a data.frame with the splicing ratios (transcript x sample). 
+##' @return a value for the dispersion.
+##' @author Diego Garrido-Martín
+##' @keywords internal
+te.dispersion <- function (tr) {
+  c <- as.numeric(apply(tr, 1, function(x)(mean(x, na.rm = T))))         
+  d <- mean(apply(tr, 2, function(x)(hellingerDist.p(x, c))), na.rm = T)  
+  return(d)
+}
+
+##' Compute the number of different splicing ratios. Too few splicing ratios is
+##' a concern for the permutation process. Indeed if many samples exactly the same
+##' splicing ratios, the permutation might create many identical permuted F scores.
+##' @title Number of different splicing ratio points
+##' @param sr a data.frame with the splicing ratios (transcript x sample).
+##' @return the number of different splicing ratios.
+##' @author Jean Monlong
+##' @keywords internal
+nbDiffPt <- function(sr){
+  length(unique(apply(sr, 2, paste, collapse = "-")))
+}

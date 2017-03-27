@@ -156,6 +156,7 @@ compute.nominal.pv <- function(geno.df, tre.dist, permute = FALSE){
 ##' @param tre.dist a interdistance matrix produced by \code{\link{hellingerDist}}.
 ##' @param best.snp SNP with the smallest observed nominal P-value, computed by \code{\link{compute.nominal.pv}}.
 ##' @param min.pv.obs smallest observed nominal P-value.
+##' @param comp.ld should linkage disequilibrium estimates be computed (median R2). Default is TRUE.
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the smallest observed nominal P-value to allow the computation to stop. Default is 100. 
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
@@ -220,27 +221,3 @@ compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, 
                        runtime = t.run) 
   return(res.df)
 } 
-
-gower <- function (d.mat) {
-  d.mat <- as.matrix(d.mat)  
-  n <- nrow(d.mat)
-  A <- -0.5 * d.mat^2
-  As <- A - rep(colMeans(A), rep.int(n, n))
-  return(t(As) - rep(rowMeans(As), rep.int(n, n)))
-}
-
-pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
-  gamma <- c(lambda, -q * lambda)                                               
-  nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
-  pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
-  if (pv$ifault != 0) {                                                        
-    return(pv)                                                                  
-  }                                                                             
-  if (pv$Qq < 0) {                                                              
-    return(pv)
-  }                                                                             
-  if (pv$ifault == 0) {
-    return(pv$Qq)                                    
-  }
-} 
-

@@ -1,6 +1,6 @@
 ##' Using \code{Rsamtools} functions to manipulate tabix file, the indexed BED file is read
 ##' and only regions defined by the desired subset are retrieved. 
-##' @title Retrieve a subset of an indexed BED file. 
+##' @title Retrieve a subset of an indexed BED file 
 ##' @param file the name of the file which the data are to be read from.
 ##' Should be compressed with \code{bgzip} and indexed by tabix algorithm.
 ##' @param subset.reg a data.frame or GRanges object with the regions to subset from.
@@ -13,7 +13,7 @@
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
 ##' @import data.table
-read.bedix <- function(file, subset.reg=NULL, header=TRUE, as.is = TRUE) {
+read.bedix <- function(file, subset.reg = NULL, header = TRUE, as.is = TRUE) {
 
   if(!is.character(file)){
     file <- as.character(file)

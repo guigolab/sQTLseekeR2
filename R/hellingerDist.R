@@ -7,11 +7,6 @@
 ##' @author Jean Monlong
 ##' @keywords internal
 hellingerDist <- function(sr){
-    hellingerDist.p <- function(x1, x2) {
-        a <- (sqrt(x1) - sqrt(x2))
-        b <- sqrt(sum(a * a))  
-        return(b)
-    }
     k <- dim(sr)[2]
     interdist <- matrix(data = 0, nrow = k, ncol = k)
     for(i in 1:k) {
@@ -24,4 +19,10 @@ hellingerDist <- function(sr){
     non.na <- !is.na(diag(interdist))                           
     interdist <- interdist[non.na, non.na]
     return(stats::as.dist(interdist))
+}
+
+hellingerDist.p <- function(x1, x2) {
+  a <- (sqrt(x1) - sqrt(x2))
+  b <- sqrt(sum(a * a))
+  return(b)
 }

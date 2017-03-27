@@ -22,6 +22,8 @@ the smallest observed nominal P-value to allow the computation to stop. Default 
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
 
+\item{comp.ld}{should linkage disequilibrium estimates be computed (median R2). Default is TRUE.}
+
 \item{verbose}{Default is TRUE. Mainly for debugging.}
 }
 \value{

@@ -1,5 +1,5 @@
 source("http://bioconductor.org/biocLite.R")
-biocLite(c("Rsamtools", "qvalue", "vegan","CompQuadForm"))
+biocLite(c("Rsamtools", "qvalue", "vegan", "CompQuadForm", "fitdistrplus"))
 install.packages("devtools")
 library(devtools)
 install_git("git://github.com/dgarrimar/sQTLseekeR2")
