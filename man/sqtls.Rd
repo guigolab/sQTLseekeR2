@@ -16,7 +16,7 @@ for each gene/SNP test.}
 \item{method}{FDR approach: either \code{"BH"} (Benjamini-Hochberg) or \code{"qvalue"} (Storey).
 Default is "BH".}
 
-\item{md.min}{the minimum MD (Maximum Difference) in relative expression desired. Maximum
+\item{md.min}{the minimum MD (Maximum Difference) in relative expression. Maximum
 difference in relative expression (MD) gives an idea of the effect size of the association.
 Default is 0.05.}
 

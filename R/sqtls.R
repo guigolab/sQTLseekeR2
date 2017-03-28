@@ -13,7 +13,7 @@
 ##' @param FDR the False Discovery Rate to call an association significant. Default is 0.05.
 ##' @param method FDR approach: either \code{"BH"} (Benjamini-Hochberg) or \code{"qvalue"} (Storey).
 ##' Default is "BH".
-##' @param md.min the minimum MD (Maximum Difference) in relative expression desired. Maximum
+##' @param md.min the minimum MD (Maximum Difference) in relative expression. Maximum
 ##' difference in relative expression (MD) gives an idea of the effect size of the association.
 ##' Default is 0.05.
 ##' @param out.pdf the name of the pdf file to create. If NULL (default), no pdf output
