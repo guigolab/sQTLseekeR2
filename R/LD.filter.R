@@ -1,18 +1,20 @@
 ##' Groups SNPs according to LD.
+##' 
 ##' Merges the SNP IDs of those variants that fulfill the following criteria:
 ##' \itemize{
 ##' \item{LD (r2) >= than a given user-defined threshold.}
 ##' \item{Relative differences in sQTL F score <= 0.05}
 ##' \item{(if svQTL = TRUE) Relative differences in sQTL F score <= 0.05}}
+##' 
 ##' @title Linkage disequilibrium (LD) filter
 ##' @param genotype.gene a data.frame with genotype info produced by 'read.bedix'.
 ##' @param tre.dist a distance object from the transcript relative expression.
 ##' @param com.samples a character vector with the common sample names between the genotype
 ##' and transcript relative expression files.
 ##' @param th r2 threshold over which SNPs will be merged. Default is 1.
-##' @param svQTL. \code{LD.filter} only merges the SNP IDs if the correlation is higher than
-##' \code{th} and the F scores for the eQTL test differ no more than a 5%. If svQTL = TRUE, 
-##' it also requiresthat the F scores for the svQTL test differ no more than the 20%. Default is TRUE.
+##' @param svQTL \code{LD.filter} only merges the SNP IDs if the LD r2 is higher than
+##' \code{th} and the F scores for the eQTL test differ no more than a 5\%. If svQTL = TRUE, 
+##' it also requires that the F scores for the svQTL test differ no more than the 20\%. Default is TRUE.
 ##' @return a data.frame with columns:
 ##' \item{F}{the F score.}
 ##' \item{nb.groups}{the number of groups created by the genotypes.}

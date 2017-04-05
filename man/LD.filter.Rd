@@ -17,9 +17,9 @@ and transcript relative expression files.}
 
 \item{th}{r2 threshold over which SNPs will be merged. Default is 1.}
 
-\item{svQTL.}{\code{LD.filter} only merges the SNP IDs if the correlation is higher than
-\code{th} and the F scores for the eQTL test differ no more than a 5%. If svQTL = TRUE, 
-it also requiresthat the F scores for the svQTL test differ no more than the 20%. Default is TRUE.}
+\item{svQTL}{\code{LD.filter} only merges the SNP IDs if the LD r2 is higher than
+\code{th} and the F scores for the eQTL test differ no more than a 5\%. If svQTL = TRUE, 
+it also requires that the F scores for the svQTL test differ no more than the 20\%. Default is TRUE.}
 }
 \value{
 a data.frame with columns:
@@ -32,6 +32,8 @@ a data.frame with columns:
 }
 \description{
 Groups SNPs according to LD.
+}
+\details{
 Merges the SNP IDs of those variants that fulfill the following criteria:
 \itemize{
 \item{LD (r2) >= than a given user-defined threshold.}
