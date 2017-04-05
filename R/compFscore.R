@@ -6,7 +6,7 @@
 ##' @param tre.df a data.frame with the transcript relative expression. 
 ##' @param svQTL should svQTL test be performed in addition to sQTL. Default is FALSE.
 ##' @param qform should significance for the F score (sQTL test) be computed using 
-##' the \code{\link[CompQuadForm]{davies}} method in the  \code{CompQuadForm} package. 
+##' the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
 ##' Default is TRUE.
 ##' @return a data.frame with columns:
 ##' \item{F}{the F score.}
@@ -78,6 +78,9 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
   }
   if(svQTL){
     res.df$F.svQTL <- adonis.comp(tre.dist, groups.snp.f, permutations = 2, svQTL = TRUE)
+  }
+  if (any(colnames(geno.df) == "LD")){
+    res.df$LD <- geno.df$LD
   }
   return(res.df)
 }

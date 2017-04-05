@@ -7,7 +7,7 @@
 sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
   min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
   nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
-  verbose = TRUE)
+  ld.filter = NULL, verbose = TRUE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -40,6 +40,10 @@ Default is TRUE.}
 used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
 but slightly increases the computation time. Default is TRUE.}
 
+\item{ld.filter}{Linkage disequilibrium threshold (r2) over which variants should be merged,
+so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
+pseudo F scores will be merged. Default is NULL.}
+
 \item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
 }
 \value{
@@ -53,6 +57,7 @@ a data.frame with columns
 \item{pv}{the P-value}
 \item{nb.perms}{the number of permutations used for the P-value computation}
 \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
+\item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 }
 \description{
 \code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
