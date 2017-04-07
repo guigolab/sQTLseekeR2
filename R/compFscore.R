@@ -96,11 +96,11 @@ gower <- function (d.mat) {
 pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
   gamma <- c(lambda, -q * lambda)                                               
   nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
-  pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
+  pv <- suppressWarnings(CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc))
   if (pv$ifault != 0) {                                                        
     return(pv)                                                                  
   }                                                                             
-  if (pv$Qq < 0) {                                                              
+  if (pv$Qq < 0 | pv$Qq > 1) {                                                              
     return(pv)
   }                                                                             
   if (pv$ifault == 0) {
