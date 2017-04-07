@@ -139,7 +139,7 @@ F.calc <- function(tre.dist, snp, svQTL = FALSE){
   }
   snp.f <- factor(snp)
   if(!svQTL){
-    G <- sQTLseekeR2:::gower(tre.dist)
+    G <- gower(tre.dist)
     dfnum <- nlevels(snp.f) - 1
     dfden <- attr(tre.dist,"Size") - dfnum - 1
     X <- stats::model.matrix(~., data = data.frame(genotype = snp.f), contrasts.arg = list("genotype" = "contr.sum"))     
@@ -151,7 +151,7 @@ F.calc <- function(tre.dist, snp, svQTL = FALSE){
     return(f.snp)
   }else{
     bd <- vegan::betadisper(tre.dist, snp.f, type = "centroid")
-    bd.perm <- sQTLseekeR2:::permutest.betadisper(bd, control = permute::how(nperm = 2)) 
+    bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
     return(bd.perm$F)
   }
   
