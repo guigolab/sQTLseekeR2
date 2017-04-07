@@ -25,7 +25,7 @@ compute.null(F.lead, dis, nb.gp, min.nb.ext.scores = 1000,
 Default is TRUE.}
 }
 \value{
-a list with
+a list with:
 \item{FP}{a vector of the permuted F scores.}
 \item{nbP.tot}{the number of permuted F scores.}
 }

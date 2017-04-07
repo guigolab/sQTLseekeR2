@@ -31,7 +31,7 @@
 ##' @author Diego Garrido-Martín
 ##' @export
 ##' @import fitdistrplus
-sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e2, nb.perm.max=1e3, verbose=TRUE){
+sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = TRUE){
   
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
   
@@ -156,6 +156,7 @@ compute.nominal.pv <- function(geno.df, tre.dist, permute = FALSE){
 ##' @param tre.dist a interdistance matrix produced by \code{\link{hellingerDist}}.
 ##' @param best.snp SNP with the smallest observed nominal P-value, computed by \code{\link{compute.nominal.pv}}.
 ##' @param min.pv.obs smallest observed nominal P-value.
+##' @param comp.ld should linkage disequilibrium estimates be computed (median R2). Default is TRUE.
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the smallest observed nominal P-value to allow the computation to stop. Default is 100. 
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
@@ -173,7 +174,7 @@ compute.nominal.pv <- function(geno.df, tre.dist, permute = FALSE){
 ##' \item{runtime}{approximated computation time per gene.}
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
-compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, min.nb.ext.scores = 1e2, nb.perm.max = 1e3, comp.ld = TRUE, verbose = FALSE){
+compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, min.nb.ext.scores = 100, nb.perm.max = 1000, comp.ld = TRUE, verbose = FALSE){
   if(comp.ld) {
     compute.ld <- function(df){
       M <- as.matrix(df)
@@ -216,31 +217,7 @@ compute.empirical.pv <- function(genotype.gene, tre.dist, best.snp, min.pv.obs, 
   t1 <- Sys.time()
   t.run <- as.numeric(difftime(t1, t0, units = "mins"))
   res.df <- data.frame(variants.cis = dim(genotype.gene)[1], LD = ld, best.snp = best.snp, best.nominal.pv = min.pv.obs, 
-                       shape1 = shape1, shape2 = shape2, nb.perms = length(store.perm), pv.emp = pv, pv.emp.beta = pv.beta,
+                       shape1 = shape1, shape2 = shape2, nb.perm = length(store.perm), pv.emp.perm = pv, pv.emp.beta = pv.beta,
                        runtime = t.run) 
   return(res.df)
 } 
-
-gower <- function (d.mat) {
-  d.mat <- as.matrix(d.mat)  
-  n <- nrow(d.mat)
-  A <- -0.5 * d.mat^2
-  As <- A - rep(colMeans(A), rep.int(n, n))
-  return(t(As) - rep(rowMeans(As), rep.int(n, n)))
-}
-
-pcqf <- function(q, lambda, k, p, n = length(lambda), lim = 5e4, acc = start.acc) {
-  gamma <- c(lambda, -q * lambda)                                               
-  nu <- c(rep(k, length(lambda)), rep(n - p - 1, length(lambda)))               
-  pv <- CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc)
-  if (pv$ifault != 0) {                                                        
-    return(pv)                                                                  
-  }                                                                             
-  if (pv$Qq < 0) {                                                              
-    return(pv)
-  }                                                                             
-  if (pv$ifault == 0) {
-    return(pv$Qq)                                    
-  }
-} 
-

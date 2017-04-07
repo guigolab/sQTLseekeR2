@@ -7,14 +7,14 @@
 index.genotype(file)
 }
 \arguments{
-\item{file}{the name of the genotype file}
+\item{file}{the name of the genotype file.}
 }
 \value{
 the name of the indexed genotype file.
 }
 \description{
 Index genotype file. The file must be tab-separated and ordered by chr, start, end
-position. Moreover, the first four columns must be 'chr', 'start', 'end' and 'snpId'
+position. Moreover, the first four columns must contain 'chr', 'start', 'end' and 'snpId'
 information. Then each additional column is named using a sample ID and represents
 its genotype. The genotype is coded as follow: 0 for ref/ref, 1 for ref/mut, 2 for
 mut/mut and -1 for missing values. The input file should be a text file.

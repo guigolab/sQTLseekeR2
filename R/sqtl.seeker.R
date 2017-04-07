@@ -37,7 +37,7 @@
 ##' 'end' and 'geneId' are required.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
-##' the highest true score to allow the computation to stop. Default is 1e3.
+##' the highest true score to allow the computation to stop. Default is 1000.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1e6.
 ##' @param nb.perm.max.svQTL the maximum number of permutations for the svQTL computation. Default is 1e4.
 ##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
@@ -48,6 +48,9 @@
 ##' @param qform should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
 ##' used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
 ##' but slightly increases the computation time. Default is TRUE.
+##' @param ld.filter Linkage disequilibrium threshold (r2) over which variants should be merged,
+##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
+##' pseudo F scores will be merged. Default is NULL.  
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns
 ##' \item{geneId}{the gene name}
@@ -59,9 +62,10 @@
 ##' \item{pv}{the P-value}
 ##' \item{nb.perms}{the number of permutations used for the P-value computation}
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
+##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.ext.scores=1e3, nb.perm.max=1e6, nb.perm.max.svQTL=1e4, svQTL=FALSE, approx=TRUE, qform = TRUE, verbose=TRUE){
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, verbose = TRUE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
 
@@ -87,7 +91,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.e
       tre.dist <- hellingerDist(tre.gene[, com.samples])
       res.df <- data.frame()
       
-      if(GenomicRanges::width(gr.gene) > 2e4){
+      if(GenomicRanges::width(gr.gene) > 20000 & is.null(ld.filter)){
           pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), GenomicRanges::end(gr.gene), length.out = floor(GenomicRanges::width(gr.gene)/1e4) + 1)))
           gr.gene.spl <- rep(gr.gene, length(pos.breaks) - 1)
           GenomicRanges::start(gr.gene.spl) <- pos.breaks[-length(pos.breaks)]
@@ -111,6 +115,10 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.e
           }
           if(any(snps.to.keep == "PASS")){
             genotype.gene <- genotype.gene[snps.to.keep == "PASS", ]
+            if(!is.null(ld.filter)){
+              message("\tLD filtering")
+              genotype.gene <- LD.filter(genotype.gene = genotype.gene, com.samples = com.samples, tre.dist = tre.dist, th = ld.filter, svQTL = svQTL)
+            }
             res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
           }
         }
@@ -121,11 +129,18 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window=5e3, min.nb.e
       if(length(range.done) > 0){
         res.df <- res.df[range.done]
         res.df <- do.call(rbind, res.df)
+        if (!is.null(ld.filter) & any(colnames(res.df)=="LD")){
+          ld <- res.df$LD 
+          res.df$LD <- NULL
+        }
         if(!qform){
           res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, approx = approx, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
         }
         if(svQTL){
           res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
+        }
+        if (!is.null(ld.filter) & any(colnames(res.df)=="LD")){
+          res.df$LD <- ld
         }
         return(data.frame(done = TRUE, res.df))
       }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/read.bedix.R
 \name{read.bedix}
 \alias{read.bedix}
-\title{Retrieve a subset of an indexed BED file.}
+\title{Retrieve a subset of an indexed BED file}
 \usage{
 read.bedix(file, subset.reg = NULL, header = TRUE, as.is = TRUE)
 }
