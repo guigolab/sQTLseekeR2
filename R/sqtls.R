@@ -29,7 +29,7 @@ sqtls <- function(res.df, FDR = 0.05, method = "BH", md.min = 0.05, out.pdf = NU
   pv <- md <- NULL ## Uglily suppress R checks for ggplot2
   
   if (method == "BH"){
-    res.df$fdr <- stats::p.adjust(res.df$pv)
+    res.df$fdr <- stats::p.adjust(res.df$pv, method = "BH")
   }else if (method == "qvalue"){
     res.df$fdr <- qvalue::qvalue(res.df$pv)$qvalues
   }else{
@@ -46,7 +46,7 @@ sqtls <- function(res.df, FDR = 0.05, method = "BH", md.min = 0.05, out.pdf = NU
   
   if(any(colnames(res.df)=="pv.svQTL")){
     if (method == "BH"){
-      res.df$fdr.svQTL <- stats::p.adjust(res.df$pv.svQTL)
+      res.df$fdr.svQTL <- stats::p.adjust(res.df$pv.svQTL, method = "BH")
     }else if (method == "qvalue"){
       res.df$fdr.svQTL <- qvalue::qvalue(res.df$pv.svQTL)$qvalues
     }

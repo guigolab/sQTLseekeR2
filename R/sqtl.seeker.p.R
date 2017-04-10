@@ -31,7 +31,7 @@
 ##' @author Diego Garrido-Martín
 ##' @export
 ##' @import fitdistrplus
-sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = TRUE){
+sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = FALSE){
   
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
   

@@ -45,7 +45,7 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
   
   if (any(colnames(res.nominal.df) == "pv.svQTL") & svQTL.removal) {
     if (method == "BH"){
-      res.nominal.df$fdr.svQTL <- stats::p.adjust(res.nominal.df$pv.svQTL)
+      res.nominal.df$fdr.svQTL <- stats::p.adjust(res.nominal.df$pv.svQTL, method = "BH")
     }else if (method == "qvalue"){
       res.nominal.df$fdr.svQTL <- qvalue::qvalue(res.nominal.df$pv.svQTL)$qvalues
     }else{
@@ -54,7 +54,7 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
   }
   
   if (method == "BH"){
-    res.permuted.df$fdr <- stats::p.adjust(res.permuted.df$pv.emp.beta)
+    res.permuted.df$fdr <- stats::p.adjust(res.permuted.df$pv.emp.beta, method = "BH")
   }else if (method == "qvalue"){
     res.permuted.df$fdr <- qvalue::qvalue(res.permuted.df$pv.emp.beta)$qvalues
   }else{
