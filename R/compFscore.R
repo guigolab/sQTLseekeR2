@@ -13,6 +13,7 @@
 ##' \item{nb.groups}{the number of groups created by the genotypes.}
 ##' \item{md}{the maximum difference in splicing ratios between genotype groups.}
 ##' \item{tr.first, tr.second}{the two transcripts that change the most.}
+##' \item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
 ##' \item{pv}{if \code{qform = TRUE} a P-value for the F score is computed}
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
@@ -28,7 +29,11 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
   # # if(!any(colnames(geno.df) %in% labels(tre.dist))){
   # #   stop("No common samples between genotype and transcript ratios files.")
   # # } # Checked before
-  
+  info.snp <- c()
+  tb.snp <- table(geno.snp)
+  for (gt in c("-1","0","1","2")){
+    info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
+  }
   geno.snp <- as.numeric(geno.df[,labels(tre.dist)])
   names(geno.snp) <- labels(tre.dist)
   if(any(geno.snp == -1)){
@@ -36,6 +41,7 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
     geno.snp <- geno.snp[non.na]
     tre.dist <- stats::as.dist(as.matrix(tre.dist)[non.na, non.na])
   }
+  info.snp <- paste(info.snp, collapse =",")
   groups.snp.f <- factor(as.numeric(geno.snp))
   mdt <- md.trans(tre.df, groups.snp.f, labels(tre.dist))
   if(qform){
@@ -65,6 +71,7 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
                          md = mdt$md,
                          tr.first = mdt$tr.first,
                          tr.second = mdt$tr.second,
+                         info = info.snp,
                          pv = pv.snp,
                          stringsAsFactors = FALSE) # Here note that p = df(factor) - 1
   }else{
@@ -74,6 +81,7 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
                          md = mdt$md,
                          tr.first = mdt$tr.first,
                          tr.second = mdt$tr.second,
+                         info = info.snp,
                          stringsAsFactors = FALSE)
   }
   if(svQTL){

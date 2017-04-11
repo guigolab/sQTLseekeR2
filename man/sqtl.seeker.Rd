@@ -7,7 +7,7 @@
 sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
   min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
   nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
-  ld.filter = NULL, verbose = TRUE)
+  ld.filter = NULL, verbose = FALSE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -54,6 +54,7 @@ a data.frame with columns
 \item{nb.groups}{the number of genotype groups (2 or 3)}
 \item{md}{the maximum difference in relative expression between genotype groups (see Details)}
 \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
+\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
 \item{pv}{the P-value}
 \item{nb.perms}{the number of permutations used for the P-value computation}
 \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}

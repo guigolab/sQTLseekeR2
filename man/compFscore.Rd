@@ -25,6 +25,7 @@ a data.frame with columns:
 \item{nb.groups}{the number of groups created by the genotypes.}
 \item{md}{the maximum difference in splicing ratios between genotype groups.}
 \item{tr.first, tr.second}{the two transcripts that change the most.}
+\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
 \item{pv}{if \code{qform = TRUE} a P-value for the F score is computed}
 }
 \description{

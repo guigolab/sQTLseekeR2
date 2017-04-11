@@ -47,7 +47,7 @@ if(is.null(res3) & !is.null(res2)){ # Some checks
 }
 
 if (is.null(res)){
-  genotype.gene$LD<-rep(NA,nrow(genotype.gene))
+  genotype.gene$LD <- rep(NA, nrow(genotype.gene))
   return(genotype.gene)
 } else{
   res <- as.data.frame(res)
@@ -77,12 +77,12 @@ computeLD <- function(M, ids, tre.dist, th = 1, tol = 0.05, svQTL = FALSE){
     R <- R^2
     blocks <- lapply(as.data.frame(R),function(x) which(x >= th))
     names(blocks) <- 1:s 
-    if (th < 1){
+    # if (th < 1){
       blocks <- F.filter(blocks = blocks, tre.dist = tre.dist, M = M, tol = tol, svQTL = FALSE)
       if(svQTL){
         blocks <- F.filter(blocks = blocks, tre.dist = tre.dist, M = M, tol = tol, svQTL = TRUE)
       }
-    }
+    # }
     store <- c()
     bsc <- prune_reorder(blocks, R)
     blocks <- bsc[[1]]

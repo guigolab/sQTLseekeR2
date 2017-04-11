@@ -5,7 +5,7 @@
 \title{permuted sQTL seeker}
 \usage{
 sqtl.seeker.p(tre.df, genotype.f, gene.loc, genic.window = 5000,
-  min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = TRUE)
+  min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = FALSE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression

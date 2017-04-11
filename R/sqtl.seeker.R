@@ -59,6 +59,7 @@
 ##' \item{nb.groups}{the number of genotype groups (2 or 3)}
 ##' \item{md}{the maximum difference in relative expression between genotype groups (see Details)}
 ##' \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
+##' \item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
 ##' \item{pv}{the P-value}
 ##' \item{nb.perms}{the number of permutations used for the P-value computation}
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
@@ -116,7 +117,9 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
           if(any(snps.to.keep == "PASS")){
             genotype.gene <- genotype.gene[snps.to.keep == "PASS", ]
             if(!is.null(ld.filter)){
-              message("\tLD filtering")
+              if(verbose){
+                message("\tLD filtering")
+              }
               genotype.gene <- LD.filter(genotype.gene = genotype.gene, com.samples = com.samples, tre.dist = tre.dist, th = ld.filter, svQTL = svQTL)
             }
             res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
