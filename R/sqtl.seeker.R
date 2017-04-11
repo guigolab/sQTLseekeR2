@@ -129,7 +129,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
       if(length(range.done) > 0){
         res.df <- res.df[range.done]
         res.df <- do.call(rbind, res.df)
-        if (!is.null(ld.filter) & any(colnames(res.df)=="LD")){
+        if (!is.null(ld.filter)){
           ld <- res.df$LD 
           res.df$LD <- NULL
         }
@@ -139,7 +139,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
         if(svQTL){
           res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
         }
-        if (!is.null(ld.filter) & any(colnames(res.df)=="LD")){
+        if (!is.null(ld.filter)){
           res.df$LD <- ld
         }
         return(data.frame(done = TRUE, res.df))
