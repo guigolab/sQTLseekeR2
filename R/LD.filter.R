@@ -25,8 +25,8 @@
 ##' @author Diego Garrido-Martín
 ##' @keywords internal
 LD.filter <- function(genotype.gene, com.samples, tre.dist, th = 1, tol = 0.05, svQTL = FALSE){
-if (th > 1){
-  stop ("Treshold for LD must be <= 1.")
+if (th > 1 | !is.numeric(th)){
+  stop ("Treshold for LD must be a numeric value <= 1.")
 }
 ids <- genotype.gene$snpId
 g <- genotype.gene[, com.samples]
