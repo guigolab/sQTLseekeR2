@@ -29,13 +29,16 @@ compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
   # # if(!any(colnames(geno.df) %in% labels(tre.dist))){
   # #   stop("No common samples between genotype and transcript ratios files.")
   # # } # Checked before
+
+  geno.snp <- as.numeric(geno.df[,labels(tre.dist)])
+  names(geno.snp) <- labels(tre.dist)
+
   info.snp <- c()
   tb.snp <- table(geno.snp)
   for (gt in c("-1","0","1","2")){
     info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
   }
-  geno.snp <- as.numeric(geno.df[,labels(tre.dist)])
-  names(geno.snp) <- labels(tre.dist)
+  
   if(any(geno.snp == -1)){
     non.na <- geno.snp > -1
     geno.snp <- geno.snp[non.na]
