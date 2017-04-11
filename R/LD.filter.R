@@ -31,7 +31,7 @@ if (th > 1){
 ids <- genotype.gene$snpId
 g <- genotype.gene[, com.samples]
 colnames(g) <- rownames(g) <- NULL
-nG <- apply(g, 1, function(x)(length(table(x)))) # Get nb of groups (2 or 3) for each SNP ID
+nG <- apply(g, 1, function(x)(length(table(x[x > -1])))) # Get nb of groups (2 or 3) for each SNP ID
 M <- t(g)
 M[M == -1] <- NA
 
@@ -47,6 +47,7 @@ if(is.null(res3) & !is.null(res2)){ # Some checks
 }
 
 if (is.null(res)){
+  genotype.gene$LD<-rep(NA,nrow(genotype.gene))
   return(genotype.gene)
 } else{
   res <- as.data.frame(res)
