@@ -5,8 +5,7 @@
 \title{sQTL retrieval from permuted phenotypes}
 \usage{
 sqtls.p(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH",
-  md.min = 0.05, out.pdf = NULL, svQTL.removal = FALSE,
-  FDR.svQTL = 0.05)
+  md.min = 0.05, svQTL.removal = FALSE, FDR.svQTL = 0.05)
 }
 \arguments{
 \item{res.nominal.df}{a data.frame, output of 'sqtl.seeker' with the nominal P-values
@@ -24,19 +23,17 @@ tends to be less stringent.  Default is "BH".}
 difference in relative expression (MD) gives an idea of the effect size of the association.
 Default is 0.05.}
 
-\item{out.pdf}{the name of the pdf file to create. If NULL (default), no pdf output
-will be created. If non-NULL, the distribution of the P-values and a semi-volcano plot
-(P-value vs MD) will be shown.}
-
 \item{svQTL.removal}{if TRUE (and column 'pv.svQTL' is present in 'res.df') significant
 sQTL which are also significant svQTLs are not reported. Default is FALSE.}
 
 \item{FDR.svQTL}{the False Discovery Rate to call a svQTL, that may be removed from the final set of sQTLs. 
 Note that svQTL FDR is computed on the pooled nominal P-values from the svQTL test.}
 }
+\value{
+a data.frame with the columns of sqtl.seeker and sqtl.seeker.p outputs with the significant sQTLs.
+}
 \description{
-Retrieves sQTLs after two-level multiple testing correction and svQTL removal (if requested). The distribution of the P-values and 
-a semi-volcano plot can be also displayed.
+Retrieves sQTLs after two-level multiple testing correction and svQTL removal (if requested).
 }
 \details{
 We consider two levels of multiple testing:

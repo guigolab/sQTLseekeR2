@@ -1,5 +1,4 @@
-##' Retrieves sQTLs after two-level multiple testing correction and svQTL removal (if requested). The distribution of the P-values and 
-##' a semi-volcano plot can be also displayed.
+##' Retrieves sQTLs after two-level multiple testing correction and svQTL removal (if requested). 
 ##'
 ##' We consider two levels of multiple testing:
 ##' \itemize{
@@ -27,14 +26,11 @@
 ##' sQTL which are also significant svQTLs are not reported. Default is FALSE.
 ##' @param FDR.svQTL the False Discovery Rate to call a svQTL, that may be removed from the final set of sQTLs. 
 ##' Note that svQTL FDR is computed on the pooled nominal P-values from the svQTL test.
-##' @param out.pdf the name of the pdf file to create. If NULL (default), no pdf output
-##' will be created. If non-NULL, the distribution of the P-values and a semi-volcano plot
-##' (P-value vs MD) will be shown.
+##' @return a data.frame with the columns of sqtl.seeker and sqtl.seeker.p outputs with the significant sQTLs.
 ##' @author Diego Garrido-Martín
 ##' @export
-sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", md.min = 0.05, out.pdf = NULL, 
-                    svQTL.removal = FALSE, FDR.svQTL = 0.05){
- 
+sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", md.min = 0.05, svQTL.removal = FALSE, FDR.svQTL = 0.05){
+  
   pv <- md <- NULL ## Uglily suppress R checks for ggplot2
   traceBack <- function(nominals.gene, permuted.df, p_t){
     permuted.gene <- subset(permuted.df, geneId == nominals.gene$geneId[1])
@@ -42,7 +38,6 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
     permuted.gene$p_tn <- p_tn
     return(merge(permuted.gene, subset(nominals.gene, pv <= p_tn)))
   }
-  
   if (any(colnames(res.nominal.df) == "pv.svQTL") & svQTL.removal) {
     if (method == "BH"){
       res.nominal.df$fdr.svQTL <- stats::p.adjust(res.nominal.df$pv.svQTL, method = "BH")
@@ -52,7 +47,6 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
       stop("Available methods for FDR are 'BH' and 'qvalue'.")
     }
   }
-  
   if (method == "BH"){
     res.permuted.df$fdr <- stats::p.adjust(res.permuted.df$pv.emp.beta, method = "BH")
   }else if (method == "qvalue"){
@@ -60,7 +54,6 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
   }else{
     stop("Available methods for FDR are 'BH' and 'qvalue'.")
   }
-  
   res.permuted.df <- subset(res.permuted.df, fdr <= FDR)
   res.nominal.df <- subset(res.nominal.df, geneId %in% res.permuted.df$geneId)
   err <- min(abs(res.permuted.df$fdr - FDR))
@@ -74,32 +67,10 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
   message(sprintf("Global empirical P-value threshold = %0.2e",p_t))
   res.df <- as.data.frame(dplyr::do(dplyr::group_by(res.nominal.df, geneId), traceBack(., res.permuted.df, p_t)))
   
-  if (!svQTL.removal){
+  if (svQTL.removal){
     res.df <- subset(res.df, fdr.svQTL > FDR.svQTL & md >= md.min)
-    if(!is.null(out.pdf)){
-      grDevices::pdf(out.pdf, 8, 6)
-      suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(x = pv)) +
-                               ggplot2::geom_histogram() + ggplot2::theme_bw() + 
-                               ggplot2::xlab("P-value") + ggplot2::ylab("number of gene/SNP pairs")
-      ))
-      grDevices::dev.off()
-    }
   }else{
     res.df <- subset(res.df, md >= md.min)
-    if(!is.null(out.pdf)){
-      grDevices::pdf(out.pdf, 8, 6)
-      suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(x = pv)) +
-                               ggplot2::geom_histogram() + ggplot2::theme_bw() + 
-                               ggplot2::xlab("P-value") + ggplot2::ylab("number of gene/SNP pairs") +
-                               ggplot2::ggtitle("After svQTL removal")
-      ))
-      suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(y = -log10(pv), x = md)) +
-                               ggplot2::geom_bin2d(bins = 200) + ggplot2::theme_bw() +
-                               ggplot2::ylab(expression('-log'[10]*' P-value')) + 
-                               ggplot2::xlab("MD (Maximum difference in relative expression)")
-      ))
-      grDevices::dev.off()
-    }
-  } 
+  }
   return(res.df)
 }
