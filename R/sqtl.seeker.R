@@ -133,7 +133,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
         res.df <- res.df[range.done]
         res.df <- do.call(rbind, res.df)
         if (!is.null(ld.filter)){
-          ld <- res.df$LD 
+          ld <- res.df[,c("snpId","LD")] 
           res.df$LD <- NULL
         }
         if(!qform){
@@ -143,8 +143,9 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
           res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
         }
         if (!is.null(ld.filter)){
-          res.df$LD <- ld
+          res.df <- merge(res.df, ld, by="snpId")
         }
+        res.df <- dplyr::arrange(res.df, pv)
         return(data.frame(done = TRUE, res.df))
       }
     } else {
