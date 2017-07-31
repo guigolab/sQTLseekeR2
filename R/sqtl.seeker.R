@@ -52,7 +52,7 @@
 ##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
 ##' pseudo F scores will be merged. Default is NULL.  
 ##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
-##' are filtered out.
+##' are filtered out. Default is 10.
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns
 ##' \item{geneId}{the gene name}

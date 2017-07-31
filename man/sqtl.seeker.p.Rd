@@ -28,7 +28,7 @@ the lowest observed nominal P-value to allow the computation to stop. Default is
 \item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
 
 \item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
-are filtered out.}
+are filtered out. Default is 10.}
 
 \item{verbose}{Default is TRUE. Mainly for debugging.}
 }

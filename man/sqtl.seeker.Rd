@@ -45,7 +45,7 @@ so that only one SNP per LD block is tested. Only variants over the treshold tha
 pseudo F scores will be merged. Default is NULL.}
 
 \item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
-are filtered out.}
+are filtered out. Default is 10.}
 
 \item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
 }
