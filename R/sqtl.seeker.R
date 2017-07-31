@@ -8,7 +8,7 @@
 ##' filters remove SNP with:
 ##' \itemize{
 ##' \item{more than 3 unknown genotypes}
-##' \item{less than 10 samples in any genotype group}
+##' \item{less than min.nb.ind.geno samples in any genotype group}
 ##' \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 ##'
 ##' Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
@@ -51,6 +51,8 @@
 ##' @param ld.filter Linkage disequilibrium threshold (r2) over which variants should be merged,
 ##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
 ##' pseudo F scores will be merged. Default is NULL.  
+##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
+##' are filtered out.
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns
 ##' \item{geneId}{the gene name}
@@ -66,7 +68,7 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, verbose = FALSE){
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
 
@@ -109,7 +111,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
         if(verbose & is.null(genotype.gene)){message("\tNo SNPs in the genomic range.")}
         if(!is.null(genotype.gene)){
           ## Filter out SNPs with not enough power
-          snps.to.keep <- check.genotype(genotype.gene[,com.samples], tre.gene[, com.samples])
+          snps.to.keep <- check.genotype(genotype.gene[,com.samples], tre.gene[, com.samples], min.nb.ind.geno = min.nb.ind.geno)
           if(verbose){
             snps.to.keep.t <- table(snps.to.keep)
             message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse=", "))
@@ -189,7 +191,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
 ##' \item{"PASS"}{ }
 ##' @author Jean Monlong, Diego Garrido-Martín 
 ##' @keywords internal
-check.genotype <- function(geno.df, tre.df){
+check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10){
   apply(geno.df, 1, function(geno.snp){
     if(sum(as.numeric(geno.snp) == -1) > 2){
       return("Missing genotype")
@@ -198,8 +200,8 @@ check.genotype <- function(geno.df, tre.df){
     if (length(geno.snp.t) < 2) {
       return("Only one genotype group")                    
     }
-    if (sum(geno.snp.t >= 10) < length(geno.snp.t)) {
-      return("Not all the groups with >10 samples")        
+    if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
+      return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
     }
     nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
       nbDiffPt(tre.df[, which(geno.snp == geno.i)])

@@ -4,7 +4,7 @@
 \alias{check.genotype}
 \title{Check genotype}
 \usage{
-check.genotype(geno.df, tre.df)
+check.genotype(geno.df, tre.df, min.nb.ind.geno = 10)
 }
 \arguments{
 \item{geno.df}{a data.frame of genotypes produced by \code{\link{read.bedix}}.}

@@ -7,7 +7,7 @@
 sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
   min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
   nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
-  ld.filter = NULL, verbose = FALSE)
+  ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -44,6 +44,9 @@ but slightly increases the computation time. Default is TRUE.}
 so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
 pseudo F scores will be merged. Default is NULL.}
 
+\item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
+are filtered out.}
+
 \item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
 }
 \value{
@@ -72,7 +75,7 @@ A set of filters is automatically set to remove SNPs which are unpractical or no
 filters remove SNP with:
 \itemize{
 \item{more than 3 unknown genotypes}
-\item{less than 10 samples in any genotype group}
+\item{less than min.nb.ind.geno samples in any genotype group}
 \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 
 Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances

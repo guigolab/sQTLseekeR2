@@ -5,7 +5,8 @@
 \title{permuted sQTL seeker}
 \usage{
 sqtl.seeker.p(tre.df, genotype.f, gene.loc, genic.window = 5000,
-  min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = FALSE)
+  min.nb.ext.scores = 100, nb.perm.max = 1000, min.nb.ind.geno = 10,
+  verbose = FALSE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -25,6 +26,9 @@ Same as in \code{sqtl.seeker}.}
 the lowest observed nominal P-value to allow the computation to stop. Default is 100.}
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
+
+\item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
+are filtered out.}
 
 \item{verbose}{Default is TRUE. Mainly for debugging.}
 }

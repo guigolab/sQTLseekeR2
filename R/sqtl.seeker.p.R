@@ -15,6 +15,8 @@
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the lowest observed nominal P-value to allow the computation to stop. Default is 100. 
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
+##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
+##' are filtered out.
 ##' @param verbose Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns:
 ##' \item{geneId}{the gene name}
@@ -31,7 +33,7 @@
 ##' @author Diego Garrido-Martín
 ##' @export
 ##' @import fitdistrplus
-sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, verbose = FALSE){
+sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 100, nb.perm.max = 1000, min.nb.ind.geno = 10, verbose = FALSE){
   
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
   
@@ -61,7 +63,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min
         message("\tNo SNPs in the genomic range.")
       }
       if (!is.null(genotype.gene)) {
-        snps.to.keep <- check.genotype(genotype.gene[, com.samples], tre.gene[, com.samples])
+        snps.to.keep <- check.genotype(genotype.gene[, com.samples], tre.gene[, com.samples], min.nb.ind.geno = min.nb.ind.geno)
         if (verbose) {
           snps.to.keep.t <- table(snps.to.keep)
           message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse = ", "))
