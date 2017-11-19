@@ -45,13 +45,13 @@ prepare.trans.exp <- function(te.df, min.transcript.exp = 0.01,min.gene.exp = 0.
   if(all(!trans.to.keep)){
     stop("No transcripts with expression above threshold")
   }
-  if(verbose & any(!trans.to.keep)){
+  if(verbose && any(!trans.to.keep)){
     message("Filtered transcripts : ", paste(te.df$trId[which(!trans.to.keep)], collapse = " "))
   }
   te.df <- te.df[which(trans.to.keep), ]
   nb.trans <- table(te.df$geneId)
   trans2 <- names(which(nb.trans > 1))
-  if(verbose & any(nb.trans <= 1)){
+  if(verbose && any(nb.trans <= 1)){
     message("Filtered single-transcript genes : ", paste(setdiff(unique(te.df$geneId), trans2), collapse = " "))
   }
   te.df <- te.df[which(te.df$geneId %in% trans2), ]
@@ -59,7 +59,7 @@ prepare.trans.exp <- function(te.df, min.transcript.exp = 0.01,min.gene.exp = 0.
   relativize.filter.dispersion <- function(df) {
     df[, samples] <- apply(df[, samples], 2, relativize, min.gene.exp = min.gene.exp)
     disp <- te.dispersion(df[, samples])
-    if (disp > min.dispersion & nbDiffPt(df[, samples]) >                  
+    if (disp > min.dispersion && nbDiffPt(df[, samples]) >                  
         min(25, length(samples) * 0.8)){
       return(df)
     } 
@@ -71,7 +71,7 @@ prepare.trans.exp <- function(te.df, min.transcript.exp = 0.01,min.gene.exp = 0.
     relativize.filter.dispersion(df)
   }), identity)
 
-  if(verbose & length(unique(te.df$geneId)) != length(trans2)){
+  if(verbose && length(unique(te.df$geneId)) != length(trans2)){
     message("Filtered low exp/disp genes : ", paste(setdiff(trans2,unique(te.df$geneId)), collapse = " "))
   }
 
