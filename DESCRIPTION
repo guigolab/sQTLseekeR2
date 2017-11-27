@@ -24,4 +24,5 @@ Imports:
     fitdistrplus
 Suggests:
     testthat
+biocViews:
 RoxygenNote: 6.0.1
