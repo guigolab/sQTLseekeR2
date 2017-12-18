@@ -5,18 +5,23 @@
 \title{Transcript expression preparation}
 \usage{
 prepare.trans.exp(te.df, min.transcript.exp = 0.01, min.gene.exp = 0.01,
-  min.dispersion = 0.1, verbose = FALSE)
+  min.prop = 0.8, min.dispersion = 0.1, verbose = FALSE)
 }
 \arguments{
 \item{te.df}{a data.frame with the transcript expression. The first
 two columns are the transcript and gene ids, named 'trId' and
-'geneId', then the values for each sample the other columns.}
+'geneId'. The rest of the columns contain the expression values for each sample.}
 
-\item{min.transcript.exp}{the minimum transcript expression. Transcript
+\item{min.transcript.exp}{the minimum transcript expression. Transcripts
 with lower expression in all samples are removed.}
 
 \item{min.gene.exp}{the minimum gene expression. Samples with lower
-gene expression are removed from the analysis of this gene.}
+gene expression are removed from the analysis of this gene. If after this step
+the proportion of retained samples for a given gene is smaller than 
+\code{min.prop} (see below), the gene is removed from the analysis.}
+
+\item{min.prop}{the minimum proportion of samples with gene expression above
+\code{min.gene.exp} for the gene to be analyzed.}
 
 \item{min.dispersion}{the minimum dispersion of the transcript
 relative expression. Genes with lower dispersion are removed.}
@@ -30,9 +35,9 @@ genes to study.
 \description{
 Prepare the transcript expression matrix. Transcripts with low
 expression are removed. Genes expressing only one transcript
-are removed because they are not informative for splicing analysis. Finally
-the relative expression of the transcripts is retrieved and genes with
-low dispersion are removed. Also genes with a small number (<25) of
+are removed because they are not informative for splicing analysis. 
+The relative transcript expression is retrieved and genes with
+low variability in splicing are removed. Also genes with a small number (<25) of
 different splicing patterns are removed as they don't fit the
 permutation process.
 }
@@ -42,5 +47,5 @@ relative expression is computed by dividing its expression
 by the total expression of all transcripts for the gene.
 }
 \author{
-Jean Monlong, Diego Garrido-Martín
+Diego Garrido-Martín, Jean Monlong
 }
