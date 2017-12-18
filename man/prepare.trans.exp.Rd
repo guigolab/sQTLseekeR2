@@ -48,5 +48,5 @@ relative expression is computed by dividing its expression
 by the total expression of all transcripts for the gene.
 }
 \author{
-Diego Garrido-Martín, Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
