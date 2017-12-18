@@ -27,7 +27,7 @@
 ##' Default is FALSE.
 ##' @return a data.frame with the relative transcript expression for the
 ##' genes to study.
-##' @author Diego Garrido-Martín, Jean Monlong
+##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
 prepare.trans.exp <- function(te.df, min.transcript.exp = 0.01, min.gene.exp = 0.01, min.prop = 0.8, min.dispersion = 0.1, verbose = FALSE){
   if(!all(c("geneId", "trId") %in% colnames(te.df))){
