@@ -4,21 +4,23 @@
 \alias{compute.nominal.pv}
 \title{Compute nominal P-value}
 \usage{
-compute.nominal.pv(geno.df, tre.dist, permute = FALSE)
+compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1)
 }
 \arguments{
-\item{geno.df}{a data.frame of a single row corresponding to the genotype of one SNP 
-observed in several individuals (columns).}
+\item{geno.df}{a data.frame with a single row corresponding to the genotype of a SNP
+observed in several individuals.}
 
-\item{tre.dist}{a interdistance matrix produced by \code{\link{hellingerDist}}.}
+\item{tre.mt}{a matrix of splicing ratios (samples x transcripts).}
 
-\item{permute}{should the interdistance matrix be permuted. Default is FALSE.}
+\item{permute}{should the rows of the splicing ratio matrix be permuted. Default is FALSE.}
+
+\item{seed}{if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.}
 }
 \value{
 A data.frame containing a P-value for the association.
 }
 \description{
-Computes nominal P-value for the association between the genotype of a SNP and the splicing ratios of a gene.
+Computes nominal P-value for the association between the genotype of a locus (e.g. SNP) and the splicing ratios of a gene.
 }
 \author{
 Diego Garrido-Martín
