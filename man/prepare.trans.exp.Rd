@@ -26,7 +26,8 @@ the proportion of retained samples for a given gene is smaller than
 \item{min.dispersion}{the minimum dispersion of the transcript
 relative expression. Genes with lower dispersion are removed.}
 
-\item{verbose}{If TRUE the names of filtered genes will be displayed. Default is FALSE.}
+\item{verbose}{If TRUE the names of filtered genes and transcripts will be displayed. 
+Default is FALSE.}
 }
 \value{
 a data.frame with the relative transcript expression for the

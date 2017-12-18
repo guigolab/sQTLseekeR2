@@ -23,7 +23,8 @@
 ##' \code{min.gene.exp} for the gene to be analyzed.
 ##' @param min.dispersion the minimum dispersion of the transcript
 ##' relative expression. Genes with lower dispersion are removed.
-##' @param verbose If TRUE the names of filtered genes will be displayed. Default is FALSE.
+##' @param verbose If TRUE the names of filtered genes and transcripts will be displayed. 
+##' Default is FALSE.
 ##' @return a data.frame with the relative transcript expression for the
 ##' genes to study.
 ##' @author Diego Garrido-Martín, Jean Monlong
