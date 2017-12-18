@@ -18,56 +18,56 @@
 ##' @author Diego Garrido-Martín
 ##' @keywords internal
 LD.filter <- function(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25){
-if (th < 0 || th > 1 || !is.numeric(th)){
-  stop ("'th' must be a numeric value in [0,1].")
-}
-if (!is.numeric(tol) || tol < 0 || tol > 1){
-  stop ("'tol' should be a numeric value in [0,1].") 
-}
-if (!is.null(tol.svqtl)){
-  if(!is.numeric(tol.svqtl) || tol.svqtl < 0 || tol.svqtl > 1){
-    stop ("'tol.svqtl' should be either NULL or a numeric value in [0,1].") 
+  if (th < 0 || th > 1 || !is.numeric(th)){
+    stop ("'th' must be a numeric value in [0,1].")
   }
-}
-ids <- genotype.gene$snpId
-g <- genotype.gene[, rownames(tre.mt)]
-colnames(g) <- rownames(g) <- NULL
-nG <- apply(g, 1, function(x)(length(table(x[x > -1])))) # Get nb of groups (2 or 3) for each SNP ID
-M <- t(g)
-M[M == -1] <- NA
+  if (!is.numeric(tol) || tol < 0 || tol > 1){
+    stop ("'tol' should be a numeric value in [0,1].") 
+  }
+  if (!is.null(tol.svqtl)){
+    if(!is.numeric(tol.svqtl) || tol.svqtl < 0 || tol.svqtl > 1){
+      stop ("'tol.svqtl' should be either NULL or a numeric value in [0,1].") 
+    }
+  }
+  ids <- genotype.gene$snpId
+  g <- genotype.gene[, rownames(tre.mt)]
+  colnames(g) <- rownames(g) <- NULL
+  nG <- apply(g, 1, function(x)(length(table(x[x > -1])))) # Get nb of groups (2 or 3) for each SNP ID
+  M <- t(g)
+  M[M == -1] <- NA
 
-res3 <- computeLD(M = M[, nG == 3], ids = ids[nG == 3], tre.mt = tre.mt, th = th, tol = tol, tol.svqtl = tol.svqtl)
-res2 <- computeLD(M = M[, nG == 2], ids = ids[nG == 2], tre.mt = tre.mt, th = th, tol = tol, tol.svqtl = tol.svqtl)
+  res3 <- computeLD(M = M[, nG == 3], ids = ids[nG == 3], tre.mt = tre.mt, th = th, tol = tol, tol.svqtl = tol.svqtl)
+  res2 <- computeLD(M = M[, nG == 2], ids = ids[nG == 2], tre.mt = tre.mt, th = th, tol = tol, tol.svqtl = tol.svqtl)
 
-if(is.null(res3) & !is.null(res2)){ # Some checks
-  res <- res2
-}else if (!is.null(res3) & is.null(res2)){
-  res <- res3 
-}else{
-  res <- rbind(res3,res2)
-}
+  if(is.null(res3) & !is.null(res2)){ # Some checks
+    res <- res2
+  }else if (!is.null(res3) & is.null(res2)){
+    res <- res3 
+  }else{
+    res <- rbind(res3,res2)
+  }
 
-if (is.null(res)){
-  genotype.gene$LD <- rep(NA, nrow(genotype.gene))
-  return(genotype.gene)
-} else{
-  res <- as.data.frame(res)
-  colnames(res) <- "LD"
-  res$LD <- as.character(unlist(res$LD))
+  if (is.null(res)){
+    genotype.gene$LD <- rep(NA, nrow(genotype.gene))
+    return(genotype.gene)
+  } else{
+    res <- as.data.frame(res)
+    colnames(res) <- "LD"
+    res$LD <- as.character(unlist(res$LD))
   
-  linked <- c(rownames(res), unlist(strsplit(res$LD, ", ", fixed = TRUE)))
-  indep_names <- ids[!ids%in%linked]
-  indep <- rep(NA, length(indep_names))
-  names(indep) <- indep_names
-  res <- rbind(res, data.frame(LD = indep))
+    linked <- c(rownames(res), unlist(strsplit(res$LD, ", ", fixed = TRUE)))
+    indep_names <- ids[!ids%in%linked]
+    indep <- rep(NA, length(indep_names))
+    names(indep) <- indep_names
+    res <- rbind(res, data.frame(LD = indep))
   
-  rownames(genotype.gene) <- ids
-  genotype.gene <- merge(genotype.gene, res, by = "row.names") 
-  genotype.gene <- with(genotype.gene, genotype.gene[order(chr, start), ])
-  genotype.gene$Row.names <- NULL
+    rownames(genotype.gene) <- ids
+    genotype.gene <- merge(genotype.gene, res, by = "row.names") 
+    genotype.gene <- with(genotype.gene, genotype.gene[order(chr, start), ])
+    genotype.gene$Row.names <- NULL
   
-  return(genotype.gene)
-}
+    return(genotype.gene)
+  }
 }
 
 computeLD <- function(M, ids, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25){
@@ -150,7 +150,6 @@ F.filter <- function(blocks, tre.mt, M, tol = 0.05, tol.svqtl = 0.25, svQTL = FA
 }
 
 F.calc <- function(tre.mt, snp, svQTL = FALSE){
-  
   if (any(is.na(snp))) {
     non.na <- !is.na(snp)
     snp <- snp[non.na]
@@ -173,7 +172,6 @@ F.calc <- function(tre.mt, snp, svQTL = FALSE){
     f.snp <- as.numeric((numer*dfden)/(denom*dfnum))  
     return(f.snp)
   }
-  
 }
 
 
