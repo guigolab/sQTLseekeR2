@@ -4,12 +4,12 @@
 \alias{LD.filter}
 \title{Linkage disequilibrium (LD) filter}
 \usage{
-LD.filter(genotype.gene, Y, th = 1, tol = 0.05, tol.svqtl = 0.25)
+LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25)
 }
 \arguments{
 \item{genotype.gene}{a data.frame with genotype info produced by 'read.bedix'.}
 
-\item{Y}{a matrix of transcript relative expression (samples x transcripts).}
+\item{tre.mt}{a matrix of transcript relative expression (samples x transcripts).}
 
 \item{th}{r2 threshold over which SNPs will be clustered. Default is 1.}
 
