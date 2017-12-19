@@ -14,7 +14,7 @@ compFscore(geno.df, tre.mt, svQTL = FALSE, qform = TRUE)
 \item{svQTL}{should svQTL test be performed in addition to sQTL. Default is FALSE.}
 
 \item{qform}{should significance for the F score (sQTL test) be computed using 
-the \code{\link[CompQuadForm]{davies}} method in the\code{\link{CompQuadForm}} package. 
+the \code{\link[CompQuadForm]{davies}} method in the \code{\link{CompQuadForm}} package. 
 Default is TRUE.}
 }
 \value{
