@@ -82,7 +82,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, qform = TRUE){
   return(res.df)
 }
 
-pcqf <- function (q, lambda, df.i, df.e, lim = 50000, acc = start.acc){
+pcqf <- function (q, lambda, df.i, df.e, lim = 50000, acc = 1e-14){
   gamma <- c(lambda, -q * lambda)
   nu <- c(rep(df.i, length(lambda)), rep(df.e, length(lambda)))
   pv <- suppressWarnings(CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc))
