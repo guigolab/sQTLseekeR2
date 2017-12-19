@@ -2,8 +2,7 @@
 ##' Additionally, it can compute a P-value to assess the significance of the F score.
 ##' @title F score computation
 ##' @param geno.df a data.frame of one row with the genotype information for each sample.
-##' @param tre.dist a distance object from the transcript relative expression.
-##' @param tre.df a data.frame with the transcript relative expression. 
+##' @param tre.mt a matrix with the transcript relative expression (samples x transcripts). 
 ##' @param svQTL should svQTL test be performed in addition to sQTL. Default is FALSE.
 ##' @param qform should significance for the F score (sQTL test) be computed using 
 ##' the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
@@ -18,7 +17,7 @@
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
 ##' @import CompQuadForm
-compFscore <- function(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE){
+compFscore <- function(geno.df, tre.mt, svQTL = FALSE, qform = TRUE){
   
   if(class(tre.dist) != "dist"){
     stop("'tre.dist' must be a distance object.")

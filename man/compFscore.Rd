@@ -4,14 +4,12 @@
 \alias{compFscore}
 \title{F score computation}
 \usage{
-compFscore(geno.df, tre.dist, tre.df, svQTL = FALSE, qform = TRUE)
+compFscore(geno.df, tre.mt, svQTL = FALSE, qform = TRUE)
 }
 \arguments{
 \item{geno.df}{a data.frame of one row with the genotype information for each sample.}
 
-\item{tre.dist}{a distance object from the transcript relative expression.}
-
-\item{tre.df}{a data.frame with the transcript relative expression.}
+\item{tre.mt}{a matrix with the transcript relative expression (samples x transcripts).}
 
 \item{svQTL}{should svQTL test be performed in addition to sQTL. Default is FALSE.}
 
