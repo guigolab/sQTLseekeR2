@@ -18,7 +18,9 @@ md.trans <- function(sr.o, groups.o){
   }
   MDtrans <- apply(mTrans, 2, function(r) diff(rbind(r[ind1], r[ind2])))
   if(!is.matrix(MDtrans)){
+    tr.names <- names(MDtrans)
     MDtrans <- matrix(MDtrans, 1)
+    colnames(MDtrans) <- tr.names
   }
   gpMD <- apply(MDtrans, 1, function(e) max(abs(e)))
   gpMD.max <- which.max(gpMD)

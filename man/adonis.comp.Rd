@@ -2,14 +2,12 @@
 % Please edit documentation in R/adonis.comp.R
 \name{adonis.comp}
 \alias{adonis.comp}
-\title{Compute single F score}
+\title{Compute F score.}
 \usage{
-adonis.comp(dis, groups, permutations = 99, f.perms = FALSE,
+adonis.comp(tre.mt, groups, permutations = 99, f.perms = FALSE,
   svQTL = FALSE, approx = TRUE)
 }
 \arguments{
-\item{dis}{the distance object of the transcript relative expression.}
-
 \item{groups}{a factor with the group information.}
 
 \item{permutations}{the number of permutations.}
@@ -21,14 +19,16 @@ real F score. Default is FALSE.}
 
 \item{approx}{should the asymptotic distribution be used instead of permutations.
 Default is TRUE.}
+
+\item{dis}{the distance object of the transcript relative expression.}
 }
 \value{
 a vector with the F score or the permuted F scores.
 }
 \description{
-Compute F score using the \code{vegan} package.
+Compute either observed F score or permuted F scores.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
 \keyword{internal}

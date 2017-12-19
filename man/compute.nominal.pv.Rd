@@ -7,8 +7,7 @@
 compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1)
 }
 \arguments{
-\item{geno.df}{a data.frame with a single row corresponding to the genotype of a SNP
-observed in several individuals.}
+\item{geno.df}{a data.frame of one row with the genotype information for each sample.}
 
 \item{tre.mt}{a matrix of splicing ratios (samples x transcripts).}
 

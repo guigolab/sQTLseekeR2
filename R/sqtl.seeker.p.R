@@ -137,8 +137,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic
 
 ##' Computes nominal P-value for the association between the genotype of a locus (e.g. SNP) and the splicing ratios of a gene.
 ##' @title Compute nominal P-value
-##' @param geno.df a data.frame with a single row corresponding to the genotype of a SNP
-##' observed in several individuals.
+##' @param geno.df a data.frame of one row with the genotype information for each sample.
 ##' @param tre.mt a matrix of splicing ratios (samples x transcripts).
 ##' @param permute should the rows of the splicing ratio matrix be permuted. Default is FALSE.
 ##' @param seed if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.

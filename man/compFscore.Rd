@@ -14,17 +14,17 @@ compFscore(geno.df, tre.mt, svQTL = FALSE, qform = TRUE)
 \item{svQTL}{should svQTL test be performed in addition to sQTL. Default is FALSE.}
 
 \item{qform}{should significance for the F score (sQTL test) be computed using 
-the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
+the \code{\link[CompQuadForm]{davies}} method in the\code{\link{CompQuadForm}} package. 
 Default is TRUE.}
 }
 \value{
-a data.frame with columns:
+A data.frame with columns:
 \item{F}{the F score.}
 \item{nb.groups}{the number of groups created by the genotypes.}
 \item{md}{the maximum difference in splicing ratios between genotype groups.}
 \item{tr.first, tr.second}{the two transcripts that change the most.}
-\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
-\item{pv}{if \code{qform = TRUE} a P-value for the F score is computed}
+\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2.}
+\item{pv}{if \code{qform = TRUE} a P-value for the F score is computed.}
 }
 \description{
 Compute the F score, max diff ratio difference and transcripts that change the most.
