@@ -141,14 +141,20 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic
 ##' @param tre.mt a matrix of splicing ratios (samples x transcripts).
 ##' @param permute should the rows of the splicing ratio matrix be permuted. Default is FALSE.
 ##' @param seed if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.
+##' @param item.acc accuracy for P-value computation. Passed to \code{pvcqf} function. Default is 1e-14.
+##' @param eigen.tol eigenvalues below this threshold are considered 0. Default = 1e-12.
+##' Minimum accuracy allowed is 1e-14.
 ##' @return A data.frame containing a P-value for the association.
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
-compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1){
+compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1, item.acc = 1e-14, eigen.tol = 1e-12){
   
   if (nrow(geno.df) > 1) {
     stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
-  } 
+  }
+  if (item.acc < 1e-14) {
+    item.acc <- 1e-14
+  }
   geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
   names(geno.snp) <- rownames(tre.mt)
   if (any(geno.snp == -1)) {
@@ -177,9 +183,8 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1){
   df.e <- fit$df.residual
   df.i <- nlevels(groups.snp.f) - 1
   e <- eigen(cov(R)*(n-1)/df.e, symmetric = T, only.values = T)$values
-  lambda <- abs(e[abs(e) > 1e-12])
+  lambda <- abs(e[abs(e) > eigen.tol])
   
-  item.acc <- 1e-14
   pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = df.i, df.e = df.e, acc = item.acc)
   while (length(pv.snp) > 1) {
     item.acc <- item.acc * 10
