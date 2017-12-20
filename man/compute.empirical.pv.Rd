@@ -26,7 +26,7 @@ the smallest observed nominal P-value to allow the computation to stop. Default 
 
 \item{comp.ld}{should linkage disequilibrium estimates be computed (median r2). Default is TRUE.}
 
-\item{verbose}{Default is TRUE. Mainly for debugging.}
+\item{verbose}{Default is FALSE.}
 }
 \value{
 a data.frame with columns:
@@ -39,7 +39,7 @@ a data.frame with columns:
 \item{nb.perms}{the number of permutations used for the empirical P-value computation.}
 \item{pv.emp}{empirical P-value based on permutations.}
 \item{pv.emp.beta}{empirical P-value based on the beta approximation.}
-\item{runtime}{approximated computation time per gene.}
+\item{runtime}{approximated computation time per gene (mins).}
 }
 \description{
 Computes empirical P-value for a gene.

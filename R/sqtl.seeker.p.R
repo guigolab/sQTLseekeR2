@@ -208,7 +208,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1, item.
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the smallest observed nominal P-value to allow the computation to stop. Default is 100. 
 ##' @param comp.ld should linkage disequilibrium estimates be computed (median r2). Default is TRUE.
-##' @param verbose Default is TRUE. Mainly for debugging.
+##' @param verbose Default is FALSE.
 ##' @return a data.frame with columns:
 ##' \item{variants.cis}{the number of variants tested in cis.}
 ##' \item{LD}{a linkage disequilibrium estimate for the genomic window (median r2).}
@@ -219,7 +219,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1, item.
 ##' \item{nb.perms}{the number of permutations used for the empirical P-value computation.}
 ##' \item{pv.emp}{empirical P-value based on permutations.}
 ##' \item{pv.emp.beta}{empirical P-value based on the beta approximation.}
-##' \item{runtime}{approximated computation time per gene.}
+##' \item{runtime}{approximated computation time per gene (mins).}
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
 compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb.perm.min = 100, nb.perm.max = 1000, min.nb.ext.scores = 100, comp.ld = TRUE, verbose = FALSE){
@@ -240,7 +240,7 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb
   pv <- 1
   while ( i <= nb.perm.min || (ext < min.nb.ext.scores && i <= nb.perm.max) ) {
     # Note that i starts in 1. Thus "<=" instead of "<" in the while loop last condition
-    if (verbose & i%%100 == 0) message (sprintf("\t\tpermutation %s",i))
+    if (verbose && i%%100 == 0) message (sprintf("\t\tpermutation %s",i))
     min.pv.perm <- min(dplyr::do(dplyr::group_by(genotype.gene, snpId),compute.nominal.pv(., tre.mt, permute = TRUE, seed = i))$pv.snp)
     store.perm <- c(store.perm, min.pv.perm)
     ext <- sum(store.perm <= min.pv.obs)
