@@ -4,8 +4,8 @@
 \alias{sqtl.seeker}
 \title{sQTL seeker}
 \usage{
-sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
-  min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
+sqtl.seeker(tre.df, genotype.f, gene.loc, covariates = NULL,
+  genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
   nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
   ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
 }
@@ -18,7 +18,10 @@ be ordered by position, compressed and indexed using 'index.genotype' or externa
 Must have column 'snpId'.}
 
 \item{gene.loc}{a data.frame with the genes location. Columns 'chr', 'start',
-'end' and 'geneId' are required.}
+'end' and 'geneId' are required.
+a data.frame with covariate information per sample (samples x covariates).
+Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
+When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
 
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
