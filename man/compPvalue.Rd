@@ -4,31 +4,31 @@
 \alias{compPvalue}
 \title{P-values computation}
 \usage{
-compPvalue(res.df, tre.dist, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
+compPvalue(res.df, tre.mt, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
   svQTL = FALSE, approx = TRUE)
 }
 \arguments{
 \item{res.df}{a data.frame with the F scores and number of groups.}
 
-\item{tre.dist}{the distance object of the transcript relative expression.}
+\item{tre.mt}{a matrix with the transcript relative expression (samples x transcripts).}
 
-\item{min.nb.ext.scores}{the minimum number of permuted score higher than
+\item{min.nb.ext.scores}{the minimum number of permuted scores higher than
 'F.lead' to allow the computation to stop. Default is 1000.}
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1e6.}
 
 \item{svQTL}{should svQTL test be performed instead of sQTL. Default is FALSE.}
 
-\item{approx}{should the asymptotic distribution be used instead of permutations.
+\item{approx}{should the asymptotic distribution (Monte Carlo) be used instead of permutations.
 Default is TRUE.}
 }
 \value{
-an updated data.frame with new columns 'pv' and 'nb.perms'.
+An updated data.frame res.df with new columns 'pv' and 'nb.perms'.
 }
 \description{
 Compute P-values from F scores.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
 \keyword{internal}
