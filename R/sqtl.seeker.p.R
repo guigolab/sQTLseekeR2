@@ -239,7 +239,7 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb
   ext <- 0
   pv <- 1
   while ( i <= nb.perm.min || (ext < min.nb.ext.scores && i <= nb.perm.max) ) {
-    # Note that i starts in 1. Thus "<=" instead of "<" in the while condition
+    # Note that i starts in 1. Thus "<=" instead of "<" in the while loop last condition
     if (verbose & i%%100 == 0) message (sprintf("\t\tpermutation %s",i))
     min.pv.perm <- min(dplyr::do(dplyr::group_by(genotype.gene, snpId),compute.nominal.pv(., tre.mt, permute = TRUE, seed = i))$pv.snp)
     store.perm <- c(store.perm, min.pv.perm)
