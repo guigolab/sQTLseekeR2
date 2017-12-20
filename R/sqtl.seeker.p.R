@@ -224,21 +224,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1, item.
 ##' @keywords internal
 compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb.perm.min = 100, nb.perm.max = 1000, min.nb.ext.scores = 100, comp.ld = TRUE, verbose = FALSE){
   if(comp.ld) {
-    compute.ld <- function(df){
-      M <- as.matrix(df)
-      ns <- dim(M)[1]
-      if(ns == 1) {
-        return(NA)
-      }
-      R <- matrix(NA, ncol = ns, nrow = ns)               
-      for (i in 1:(ns - 1)){
-        for (j in (1 + i):ns){
-          R[i, j] <- cor(M[i, ], M[j, ])^2
-        }
-      }
-      return(median(R, na.rm = T)) 
-    }
-    ld <- compute.ld(genotype.gene[, rownames(tre.mt)])
+    ld <- compute.median.ld(genotype.gene[, rownames(tre.mt)])
   }
   variants.cis <- dim(genotype.gene)[1]
   genotype.gene <- LD.filter(genotype.gene = genotype.gene, tre.mt = tre.mt, th = 1, tol = 0, tol.svqtl = NULL)             
@@ -273,3 +259,18 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb
                        runtime = t.run) 
   return(res.df)
 } 
+
+compute.median.ld <- function(df){
+  M <- as.matrix(df)
+  ns <- dim(M)[1]
+  if(ns == 1) {
+    return(NA)
+  }
+  R <- matrix(NA, ncol = ns, nrow = ns)               
+  for (i in 1:(ns - 1)){
+    for (j in (1 + i):ns){
+      R[i, j] <- cor(M[i, ], M[j, ])^2
+    }
+  }
+  return(median(R, na.rm = T)) 
+}
