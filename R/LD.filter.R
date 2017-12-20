@@ -140,7 +140,7 @@ F.filter <- function(blocks, tre.mt, M, tol = 0.05, tol.svqtl = 0.25, svQTL = FA
   d <- list()
   for (e in names(blocks)){
     subs <- blocks[[e]]
-    d[[e]] <- abs(Fs[as.character(subs)]-Fs[e])/Fs[e]
+    d[[e]] <- abs(Fs[as.character(subs)] - Fs[e])/Fs[e]
   }
   h <- list()
   for (k in names(blocks)){

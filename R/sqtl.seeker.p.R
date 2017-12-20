@@ -152,9 +152,6 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1, item.
   if (nrow(geno.df) > 1) {
     stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
   }
-  if (item.acc < 1e-14) {
-    item.acc <- 1e-14
-  }
   geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
   names(geno.snp) <- rownames(tre.mt)
   if (any(geno.snp == -1)) {
@@ -259,6 +256,7 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs, nb
                        runtime = t.run) 
   return(res.df)
 } 
+
 
 compute.median.ld <- function(df){
   M <- as.matrix(df)

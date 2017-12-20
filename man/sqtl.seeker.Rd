@@ -6,7 +6,7 @@
 \usage{
 sqtl.seeker(tre.df, genotype.f, gene.loc, covariates = NULL,
   genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
+  nb.perm.max.svQTL = 10000, svQTL = FALSE, asympt = TRUE,
   ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
 }
 \arguments{
@@ -37,12 +37,9 @@ the highest true score to allow the computation to stop. Default is 1000.}
 computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 considerably increase the running time.}
 
-\item{approx}{should the asymptotic distribution be used instead of permutations.
+\item{asympt}{should the asymptotic null distribution be used to assess significance instead of permutations. 
+The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
 Default is TRUE.}
-
-\item{qform}{should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
-used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
-but slightly increases the computation time. Default is TRUE.}
 
 \item{ld.filter}{Linkage disequilibrium threshold (r2) over which variants should be merged,
 so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 

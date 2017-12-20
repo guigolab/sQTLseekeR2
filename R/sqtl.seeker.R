@@ -46,11 +46,9 @@
 ##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
 ##' computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 ##' considerably increase the running time.
-##' @param approx should the asymptotic distribution be used instead of permutations.
+##' @param asympt should the asymptotic null distribution be used to assess significance instead of permutations. 
+##' The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
 ##' Default is TRUE.
-##' @param qform should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
-##' used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
-##' but slightly increases the computation time. Default is TRUE.
 ##' @param ld.filter Linkage disequilibrium threshold (r2) over which variants should be merged,
 ##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
 ##' pseudo F scores will be merged. Default is NULL.  
@@ -71,10 +69,8 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
-
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, asympt = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
-
   analyze.gene.f <- function(tre.gene){
     if(verbose) message(tre.gene$geneId[1])
     if(sum(duplicated(gene.loc$geneId)) > 1){
@@ -155,7 +151,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.w
               }
               genotype.gene <- LD.filter(genotype.gene = genotype.gene, tre.mt = tre.tc, th = ld.filter)
             }
-            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.tc, svQTL = svQTL, qform = qform))
+            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.tc, svQTL = svQTL, asympt = asympt))
           }
         }
         return(res.range)
@@ -169,8 +165,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.w
           ld <- res.df[,c("snpId","LD")] 
           res.df$LD <- NULL
         }
-        if(!qform){
-          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, approx = approx, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
+        if(!asympt){
+          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
         }
         if(svQTL){
           res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
@@ -188,12 +184,6 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.w
     }
     return(data.frame(done = FALSE))
   }
-
-  if(!approx & qform) {
-    warning("'qform' is ignored when 'approx' = FALSE. Type ?sqtl.seeker for more details.")
-    qform <- FALSE
-  }
-  
   ret.df <- lapply(unique(tre.df$geneId), function(gene.i){
     df <- tre.df[which(tre.df$geneId == gene.i), ]
     data.frame(geneId = gene.i, analyze.gene.f(df))

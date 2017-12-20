@@ -12,7 +12,7 @@ hellingerDist <- function(sr){
     for(i in 1:k) {
         for(j in 1:i) {
                 interdist[i, j] <- hellingerDist.p(sr[, i], sr[, j])          
-            }
+        }
     }
     interdist <- interdist + t(interdist)
     colnames(interdist) <- rownames(interdist) <- colnames(sr)
@@ -22,7 +22,7 @@ hellingerDist <- function(sr){
 }
 
 hellingerDist.p <- function(x1, x2) {
-  a <- (sqrt(x1) - sqrt(x2))
-  b <- sqrt(sum(a * a))
-  return(b)
+    a <- (sqrt(x1) - sqrt(x2))
+    b <- sqrt(sum(a * a))
+    return(b)
 }
