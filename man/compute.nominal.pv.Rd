@@ -4,7 +4,8 @@
 \alias{compute.nominal.pv}
 \title{Compute nominal P-value}
 \usage{
-compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1)
+compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1,
+  item.acc = 1e-14, eigen.tol = 1e-12)
 }
 \arguments{
 \item{geno.df}{a data.frame of one row with the genotype information for each sample.}
@@ -14,6 +15,11 @@ compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1)
 \item{permute}{should the rows of the splicing ratio matrix be permuted. Default is FALSE.}
 
 \item{seed}{if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.}
+
+\item{item.acc}{accuracy for P-value computation. Passed to \code{pvcqf} function. Default is 1e-14.
+Minimum accuracy allowed is 1e-14.}
+
+\item{eigen.tol}{eigenvalues below this threshold are considered 0. Default = 1e-12.}
 }
 \value{
 A data.frame containing a P-value for the association.
