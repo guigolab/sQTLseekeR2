@@ -35,6 +35,9 @@
 ##' Must have column 'snpId'.
 ##' @param gene.loc a data.frame with the genes location. Columns 'chr', 'start',
 ##' 'end' and 'geneId' are required.
+##' a data.frame with covariate information per sample (samples x covariates).
+##' Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
+##' When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
 ##' the highest true score to allow the computation to stop. Default is 1000.
@@ -68,7 +71,7 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, approx = TRUE, qform = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
 
   . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
 
