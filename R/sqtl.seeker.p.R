@@ -143,7 +143,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic
 ##' @param seed if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.
 ##' @param item.acc accuracy for P-value computation. Passed to \code{pvcqf} function. Default is 1e-14.
 ##' Minimum accuracy allowed is 1e-14.
-##' @param eigen.tol eigenvalues below this threshold are considered 0. Default = 1e-12.
+##' @param eigen.tol eigenvalues below this threshold are considered 0. Default is 1e-12.
 ##' @return A data.frame containing a P-value for the association.
 ##' @author Diego Garrido-Martín 
 ##' @keywords internal
