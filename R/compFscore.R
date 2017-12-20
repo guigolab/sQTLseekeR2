@@ -17,82 +17,83 @@
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
 ##' @import CompQuadForm
-compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE){
-  if(nrow(geno.df) > 1){
-    stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
-  }
-  geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
-  names(geno.snp) <- rownames(tre.mt)
-  info.snp <- c()
-  tb.snp <- table(geno.snp)
-  for (gt in c("-1", "0", "1", "2")){
-    info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
-  }
-  if (any(geno.snp == -1)) {
-    non.na <- geno.snp > -1
-    geno.snp <- geno.snp[non.na]
-    tre.mt <- tre.mt[non.na, ]
-  }
-  info.snp <- paste(info.snp, collapse =",")
-  groups.snp.f <- factor(as.numeric(geno.snp))
-  mdt <- md.trans(tre.mt, groups.snp.f)
-  n <- nrow(tre.mt)
-  nb.gp <- nlevels(groups.snp.f)
-  dfnum <- nb.gp - 1
-  dfden <- n - dfnum - 1
-  G <- tcrossprod(tre.mt)
-  X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f), 
-                           contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
-  H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
-  numer <- crossprod(c(H), c(G))
-  trG <- sum(diag(G))
-  denom <- trG - numer
-  f.tilde <- as.numeric(numer/denom)  
-  if (asympt) {
-    fit <- lm(tre.mt ~ groups.snp.f)
-    R <- fit$residuals
-    e <- eigen(cov(R)*(n-1)/dfden, symmetric = T, only.values = T)$values
-    lambda <- abs(e[abs(e) > 1e-12])
-    item.acc <- 1e-14
-    pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, df.e = dfden, acc = item.acc)
-    
-    while (length(pv.snp) > 1) {
-      item.acc <- item.acc * 10
-      pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, df.e = dfden, acc = item.acc)
+compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
+{
+    if(nrow(geno.df) > 1){
+        stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
     }
-    if (pv.snp < item.acc) {
-      pv.snp <- item.acc
+    geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
+    names(geno.snp) <- rownames(tre.mt)
+    info.snp <- c()
+    tb.snp <- table(geno.snp)
+    for (gt in c("-1", "0", "1", "2")){
+        info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
     }
-    res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp, 
-                         md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second, 
-                         info = info.snp, pv = pv.snp, stringsAsFactors = FALSE)
-  } else {
-    res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp, 
+    if (any(geno.snp == -1)) {
+        non.na <- geno.snp > -1
+        geno.snp <- geno.snp[non.na]
+        tre.mt <- tre.mt[non.na, ]
+    }
+    info.snp <- paste(info.snp, collapse =",")
+    groups.snp.f <- factor(as.numeric(geno.snp))
+    mdt <- md.trans(tre.mt, groups.snp.f)
+    n <- nrow(tre.mt)
+    nb.gp <- nlevels(groups.snp.f)
+    dfnum <- nb.gp - 1
+    dfden <- n - dfnum - 1
+    G <- tcrossprod(tre.mt)
+    X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f),
+                             contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
+    H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
+    numer <- crossprod(c(H), c(G))
+    trG <- sum(diag(G))
+    denom <- trG - numer
+    f.tilde <- as.numeric(numer/denom)  
+    if (asympt) {
+        fit <- lm(tre.mt ~ groups.snp.f)
+        R <- fit$residuals
+        e <- eigen(cov(R)*(n-1)/dfden, symmetric = T, only.values = T)$values
+        lambda <- abs(e[abs(e) > 1e-12])
+        item.acc <- 1e-14
+        pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, 
+                       df.e = dfden, acc = item.acc)
+        while (length(pv.snp) > 1) {
+            item.acc <- item.acc * 10
+            pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, 
+                           df.e = dfden, acc = item.acc)
+        }
+        if (pv.snp < item.acc) pv.snp <- item.acc
+        res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp,
+                             md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second,
+                             info = info.snp, pv = pv.snp, stringsAsFactors = FALSE)
+    } else {
+        res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp, 
                          md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second, 
                          info = info.snp, stringsAsFactors = FALSE)
-  }
-  if (svQTL) {
-    bd <- vegan::betadisper(dist(tre.mt), groups.snp.f, type = "centroid")
-    bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
-    res.df$F.svQTL <- bd.perm$F
-  }
-  if (any(colnames(geno.df) == "LD")) {
-    res.df$LD <- geno.df$LD
-  }
-  return(res.df)
+    }
+    if (svQTL) {
+        bd <- vegan::betadisper(dist(tre.mt), groups.snp.f, type = "centroid")
+        bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
+        res.df$F.svQTL <- bd.perm$F
+    }
+    if (any(colnames(geno.df) == "LD")) {
+        res.df$LD <- geno.df$LD
+    }
+    return(res.df)
 }
 
-pcqf <- function (q, lambda, df.i, df.e, lim = 50000, acc = 1e-14){
-  gamma <- c(lambda, -q * lambda)
-  nu <- c(rep(df.i, length(lambda)), rep(df.e, length(lambda)))
-  pv <- suppressWarnings(CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc))
-  if (pv$ifault != 0) {
-    return(pv)
-  }
-  if (pv$Qq < 0 || pv$Qq > 1) {
-    return(pv)
-  }
-  if (pv$ifault == 0) {
-    return(pv$Qq)
-  }
+pcqf <- function (q, lambda, df.i, df.e, lim = 50000, acc = 1e-14)
+{
+    gamma <- c(lambda, -q * lambda)
+    nu <- c(rep(df.i, length(lambda)), rep(df.e, length(lambda)))
+    pv <- suppressWarnings(CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc))
+    if (pv$ifault != 0) {
+        return(pv)
+    }
+    if (pv$Qq < 0 || pv$Qq > 1) {
+        return(pv)
+    }
+    if (pv$ifault == 0) {
+        return(pv$Qq)
+    }
 }

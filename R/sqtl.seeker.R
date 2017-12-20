@@ -69,134 +69,145 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, svQTL = FALSE, asympt = TRUE, ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE){
-  . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
-  analyze.gene.f <- function(tre.gene){
-    if(verbose) message(tre.gene$geneId[1])
-    if(sum(duplicated(gene.loc$geneId)) > 1){
-      stop(tre.gene$geneId[1], " Repeated gene in gene location file.")
-    }
-    ## Load genotype
-    gr.gene <- with(gene.loc[which(gene.loc$geneId == tre.gene$geneId[1]), ], GenomicRanges::GRanges(chr, IRanges::IRanges(start, end)))
-    if(genic.window > 0){
-      gr.gene <- GenomicRanges::resize(gr.gene, GenomicRanges::width(gr.gene) + 2 * genic.window, fix = "center")
-    }
-    if(length(gr.gene) > 0){
-      if(!is.null(covariates)){
-        if(!all(rownames(covariates) %in% colnames(tre.gene))){
-          stop("All samples should have covariate information (either a value or NA).")                  
+sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
+                        genic.window = 5000, min.nb.ext.scores = 1000, 
+                        nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, 
+                        svQTL = FALSE, asympt = TRUE, ld.filter = NULL, 
+                        min.nb.ind.geno = 10, verbose = FALSE)
+{
+    . <- nb.groups <- snpId <- NULL ## Uglily appease R checks (dplyr)
+    analyze.gene.f <- function(tre.gene){
+        if(verbose) message(tre.gene$geneId[1])
+        if(sum(duplicated(gene.loc$geneId)) > 1){
+            stop(tre.gene$geneId[1], " Repeated gene in gene location file.")
         }
-        cov.na <- apply(covariates, 1, function(x){any(is.na(x))})
-        covariates <- covariates[!cov.na, ]                                     
-        if(sum(cov.na) > 0){
-          warning(sprintf("%s samples with NA values for at least one covariate have been removed.", sum(cov.na)))     
+        gr.gene <- with(gene.loc[which(gene.loc$geneId == tre.gene$geneId[1]), ],
+                        GenomicRanges::GRanges(chr, IRanges::IRanges(start, end)))
+        if(genic.window > 0){
+            gr.gene <- GenomicRanges::resize(gr.gene, GenomicRanges::width(gr.gene) +
+                                               2 * genic.window, fix = "center")
         }
-        if(sum(cov.na) > round(0.05 * nrow(covariates))){
-          stop("More than 5% of the samples contain NA values for at least one covariate")  
-        }
-      }
-      ## Remove samples with non expressed genes
-      tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
-      ## Focus on common samples
-      genotype.headers <- as.character(utils::read.table(genotype.f, as.is = TRUE, nrows = 1))
-      if(!is.null(covariates)){
-        com.samples <- Reduce(intersect, list(colnames(tre.gene), genotype.headers, covariates$sampleId))   
-        if (length(com.samples) == 0) {
-          stop("No common samples between genotype, covariate and transcript files.")
-        }
-      } else{
-        com.samples <- intersect(colnames(tre.gene), genotype.headers)
-        if (length(com.samples) == 0) {
-          stop("No common samples between genotype and transcript files.")
-        }
-      }
-      tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
-      tre.tc <- t(sqrt(tre.gene[,com.samples]))
-      tre.tc <- scale(tre.tc, center = T, scale = F)
-      colnames(tre.tc) <- tre.gene$tr
-      # Here regress covariates and keep residual if applies
-      if(!is.null(covariates)){
-        fit <- lm(tre.tc ~ ., data = covariates)
-        tre.tc <- fit$residual
-      }
-      res.df <- data.frame()
-      
-      if(GenomicRanges::width(gr.gene) > 20000 && is.null(ld.filter)){
-          pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), GenomicRanges::end(gr.gene), length.out = floor(GenomicRanges::width(gr.gene)/10000) + 1)))
-          gr.gene.spl <- rep(gr.gene, length(pos.breaks) - 1)
-          GenomicRanges::start(gr.gene.spl) <- pos.breaks[-length(pos.breaks)]
-          pos.breaks[length(pos.breaks)] <- pos.breaks[length(pos.breaks)] + 1
-          GenomicRanges::end(gr.gene.spl) <- pos.breaks[-1] - 1
-      } else {
-          gr.gene.spl <- gr.gene
-      }
-
-      res.df <- lapply(1:length(gr.gene.spl), function(ii){
-        res.range <- data.frame()
-        if(verbose){message("  Sub-range ", ii)}
-        genotype.gene <- read.bedix(genotype.f, gr.gene.spl[ii])
-        if(verbose && is.null(genotype.gene)){message("\tNo SNPs in the genomic range.")}
-        if(!is.null(genotype.gene)){
-          ## Filter out non-suitable SNPs 
-          snps.to.keep <- check.genotype(genotype.gene[, com.samples], tre.gene[, com.samples], min.nb.ind.geno = min.nb.ind.geno)
-          if(verbose){
-            snps.to.keep.t <- table(snps.to.keep)
-            message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse=", "))
-          }
-          if(any(snps.to.keep == "PASS")){
-            genotype.gene <- genotype.gene[snps.to.keep == "PASS", ]
-            if(!is.null(ld.filter)){
-              if(verbose){
-                message("\tLD filtering")
-              }
-              genotype.gene <- LD.filter(genotype.gene = genotype.gene, tre.mt = tre.tc, th = ld.filter)
+        if(length(gr.gene) > 0){
+            if(!is.null(covariates)){
+                if(!all(rownames(covariates) %in% colnames(tre.gene))){
+                    stop("All samples should have covariate information (either a value or NA).")                  
+                }
+                cov.na <- apply(covariates, 1, function(x){any(is.na(x))})
+                covariates <- covariates[!cov.na, ]                                     
+                if(sum(cov.na) > 0){
+                    warning(sprintf("%s samples with NA values for at least one covariate have been removed.", 
+                                    sum(cov.na)))     
+                }
+                if(sum(cov.na) > round(0.05 * nrow(covariates))){
+                    stop("More than 5% of the samples contain NA values for at least one covariate")  
+                }
             }
-            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.tc, svQTL = svQTL, asympt = asympt))
-          }
+            tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
+            genotype.headers <- as.character(utils::read.table(genotype.f,
+                                                               as.is = TRUE, nrows = 1))
+            if(!is.null(covariates)){
+                com.samples <- Reduce(intersect, list(colnames(tre.gene),
+                                                      genotype.headers, covariates$sampleId))   
+                if (length(com.samples) == 0) {
+                    stop("No common samples between genotype, covariate and transcript files.")
+                }
+            } else{
+                com.samples <- intersect(colnames(tre.gene), genotype.headers)
+                if (length(com.samples) == 0) {
+                    stop("No common samples between genotype and transcript files.")
+                }
+            }
+            tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
+            tre.tc <- t(sqrt(tre.gene[, com.samples]))
+            tre.tc <- scale(tre.tc, center = T, scale = F)
+            colnames(tre.tc) <- tre.gene$tr
+            if(!is.null(covariates)){
+               fit <- lm(tre.tc ~ ., data = covariates)
+               tre.tc <- fit$residual
+            }
+            res.df <- data.frame()
+            if(GenomicRanges::width(gr.gene) > 20000 && is.null(ld.filter)){
+                pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), 
+                                               GenomicRanges::end(gr.gene), 
+                                               length.out = floor(GenomicRanges::width(gr.gene)/10000) + 1)))
+                gr.gene.spl <- rep(gr.gene, length(pos.breaks) - 1)
+                GenomicRanges::start(gr.gene.spl) <- pos.breaks[-length(pos.breaks)]
+                pos.breaks[length(pos.breaks)] <- pos.breaks[length(pos.breaks)] + 1
+                GenomicRanges::end(gr.gene.spl) <- pos.breaks[-1] - 1
+            } else {
+                gr.gene.spl <- gr.gene
+            }
+            res.df <- lapply(1:length(gr.gene.spl), function(ii){
+                res.range <- data.frame()
+                if(verbose) message("  Sub-range ", ii)
+                genotype.gene <- read.bedix(genotype.f, gr.gene.spl[ii])
+                if(verbose && is.null(genotype.gene)) message("\tNo SNPs in the genomic range.") 
+                if(!is.null(genotype.gene)){
+                    snps.to.keep <- check.genotype(genotype.gene[, com.samples], 
+                                                   tre.gene[, com.samples], 
+                                                   min.nb.ind.geno = min.nb.ind.geno)
+                    if(verbose){
+                        snps.to.keep.t <- table(snps.to.keep)
+                        message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, 
+                                            sep = ": ", collapse=", "))
+                    }
+                    if(any(snps.to.keep == "PASS")){
+                        genotype.gene <- genotype.gene[snps.to.keep == "PASS", ]
+                        if(!is.null(ld.filter)){
+                            if(verbose) message("\tLD filtering")
+                            genotype.gene <- LD.filter(genotype.gene = genotype.gene,
+                                                       tre.mt = tre.tc, th = ld.filter)
+                        }
+                        res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId),
+                                               compFscore(., tre.tc, svQTL = svQTL, 
+                                                          asympt = asympt))
+                    }
+                }
+                return(res.range)
+            })
+            range.done <- which(unlist(lapply(res.df, nrow)) > 0)
+            if(length(range.done) > 0){
+                res.df <- res.df[range.done]
+                res.df <- do.call(rbind, res.df)
+                if (!is.null(ld.filter)){
+                    ld <- res.df[,c("snpId","LD")] 
+                    res.df$LD <- NULL
+                }
+                if(!asympt){
+                    res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups),
+                                        compPvalue(., tre.tc, min.nb.ext.scores = min.nb.ext.scores,
+                                                   nb.perm.max = nb.perm.max)) 
+                }
+                if(svQTL){
+                    res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups),
+                                        compPvalue(., tre.tc, svQTL = TRUE,
+                                                   min.nb.ext.scores = min.nb.ext.scores,
+                                                   nb.perm.max = nb.perm.max.svQTL))
+                }
+                if (!is.null(ld.filter)){
+                    res.df <- merge(res.df, ld, by = "snpId")
+                }
+                res.df <- dplyr::arrange(res.df, pv)
+                return(data.frame(done = TRUE, res.df))
+            }
+        } else {
+            if(verbose) warning("Issue with the gene location.")
         }
-        return(res.range)
-      })
-      range.done <- which(unlist(lapply(res.df, nrow)) > 0)
-
-      if(length(range.done) > 0){
-        res.df <- res.df[range.done]
-        res.df <- do.call(rbind, res.df)
-        if (!is.null(ld.filter)){
-          ld <- res.df[,c("snpId","LD")] 
-          res.df$LD <- NULL
-        }
-        if(!asympt){
-          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
-        }
-        if(svQTL){
-          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
-        }
-        if (!is.null(ld.filter)){
-          res.df <- merge(res.df, ld, by = "snpId")
-        }
-        res.df <- dplyr::arrange(res.df, pv)
-        return(data.frame(done = TRUE, res.df))
-      }
-    } else {
-      if(verbose){
-        warning("Issue with the gene location.")
-      }
+        return(data.frame(done = FALSE))
     }
-    return(data.frame(done = FALSE))
-  }
-  ret.df <- lapply(unique(tre.df$geneId), function(gene.i){
-    df <- tre.df[which(tre.df$geneId == gene.i), ]
-    data.frame(geneId = gene.i, analyze.gene.f(df))
-  })
-  done <- which(unlist(lapply(ret.df, ncol)) > 2)
-  if(length(done) > 0){
-    ret.df <- ret.df[done]
-    ret.df <- do.call(rbind, ret.df)
-    ret.df$done <- NULL
-    return(ret.df)
-  } else {
-    return(NULL)
-  }
+    ret.df <- lapply(unique(tre.df$geneId), function(gene.i){
+       df <- tre.df[which(tre.df$geneId == gene.i), ]
+       data.frame(geneId = gene.i, analyze.gene.f(df))
+    })
+    done <- which(unlist(lapply(ret.df, ncol)) > 2)
+    if(length(done) > 0){
+        ret.df <- ret.df[done]
+        ret.df <- do.call(rbind, ret.df)
+        ret.df$done <- NULL
+        return(ret.df)
+    } else {
+        return(NULL)
+    }
 }
 
 ##' Labels SNPs according to their suitability for sQTL mapping.  
@@ -212,24 +223,25 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, genic.w
 ##' \item{"PASS"}{ }
 ##' @author Jean Monlong, Diego Garrido-Martín 
 ##' @keywords internal
-check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10){
-  apply(geno.df, 1, function(geno.snp){
-    if(sum(as.numeric(geno.snp) == -1) > 2){
-      return("Missing genotype")
-    }
-    geno.snp.t <- table(geno.snp[geno.snp > -1])
-    if (length(geno.snp.t) < 2) {
-      return("Only one genotype group")                    
-    }
-    if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
-      return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
-    }
-    nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
-      nbDiffPt(tre.df[, which(geno.snp == geno.i)])
+check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10)
+{
+    apply(geno.df, 1, function(geno.snp){
+        if(sum(as.numeric(geno.snp) == -1) > 2){
+            return("Missing genotype")
+        }
+        geno.snp.t <- table(geno.snp[geno.snp > -1])
+        if (length(geno.snp.t) < 2) {
+            return("Only one genotype group")                    
+        }
+        if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
+            return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
+        }
+        nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
+            nbDiffPt(tre.df[, which(geno.snp == geno.i)])
+        })
+        if(sum(nb.diff.pts >= 5) < length(geno.snp.t)){
+            return("Not all the groups with >5 different splicing patterns")
+        }
+        return("PASS")
     })
-    if(sum(nb.diff.pts >= 5) < length(geno.snp.t)){
-      return("Not all the groups with >5 different splicing patterns")
-    }
-    return("PASS")
-  })
 }

@@ -6,7 +6,8 @@
 ##' @return a matrix with the pairwise distance between samples.
 ##' @author Jean Monlong
 ##' @keywords internal
-hellingerDist <- function(sr){
+hellingerDist <- function(sr)
+{
     k <- dim(sr)[2]
     interdist <- matrix(data = 0, nrow = k, ncol = k)
     for(i in 1:k) {
@@ -21,7 +22,8 @@ hellingerDist <- function(sr){
     return(stats::as.dist(interdist))
 }
 
-hellingerDist.p <- function(x1, x2) {
+hellingerDist.p <- function(x1, x2)
+{
     a <- (sqrt(x1) - sqrt(x2))
     b <- sqrt(sum(a * a))
     return(b)

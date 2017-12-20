@@ -80,7 +80,8 @@ permutest.betadisper <- function(x, pairwise = FALSE,
                              c("Df", "Sum Sq", "Mean Sq", "F", "N.Perm",
                                "Pr(>F)"))
     retval <- list(tab = retval, pairwise = pairwise,
-                   groups = levels(x$group), control = control,F=res[1],f.perms=res[-1])
+                   groups = levels(x$group), 
+                   control = control,F=res[1],f.perms=res[-1])
     class(retval) <- "permutest.betadisper"
     retval
 }
