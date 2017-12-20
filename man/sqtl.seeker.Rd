@@ -18,8 +18,9 @@ be ordered by position, compressed and indexed using 'index.genotype' or externa
 Must have column 'snpId'.}
 
 \item{gene.loc}{a data.frame with the genes location. Columns 'chr', 'start',
-'end' and 'geneId' are required.
-a data.frame with covariate information per sample (samples x covariates).
+'end' and 'geneId' are required.}
+
+\item{covariates}{a data.frame with covariate information per sample (samples x covariates).
 Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
 
