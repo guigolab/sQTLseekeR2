@@ -51,22 +51,22 @@ are filtered out. Default is 10.}
 }
 \value{
 a data.frame with columns
-\item{geneId}{the gene name}
-\item{snpId}{the SNP name}
-\item{F}{the F score}
-\item{nb.groups}{the number of genotype groups (2 or 3)}
-\item{md}{the maximum difference in relative expression between genotype groups (see Details)}
+\item{geneId}{the gene name.}
+\item{snpId}{the SNP name.}
+\item{F}{the F score.}
+\item{nb.groups}{the number of genotype groups (2 or 3).}
+\item{md}{the maximum difference in relative expression between genotype groups (see Details).}
 \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
-\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
-\item{pv}{the P-value}
-\item{nb.perms}{the number of permutations used for the P-value computation}
+\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2.}
+\item{pv}{the P-value.}
+\item{nb.perms}{the number of permutations used for the P-value computation.}
 \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 }
 \description{
 \code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
-file, indexed by function \code{index.genotype}, association between each SNP and the transcript relative
+file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
 potentially false sQTL (see Details).
 }
@@ -78,7 +78,7 @@ filters remove SNP with:
 \item{less than min.nb.ind.geno samples in any genotype group}
 \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 
-Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
+Testing differences in transcript relative expression between genotype groups assumes homogeneity of the variances
 in these groups. Testing this assumption is more complex and computationnally intensive but if needed the user
 can choose to test for svQTL (splicing variability QTL), i.e. gene/SNPs where this assumption is violated,
 by using the \code{svQTL = TRUE}. This test is run in parallel to the sQTL tests, but the computation time

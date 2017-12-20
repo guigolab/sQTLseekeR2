@@ -1,6 +1,6 @@
 ##' \code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
 ##' prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
-##' file, indexed by function \code{index.genotype}, association between each SNP and the transcript relative
+##' file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 ##' expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
 ##' potentially false sQTL (see Details).
 ##'
@@ -11,7 +11,7 @@
 ##' \item{less than min.nb.ind.geno samples in any genotype group}
 ##' \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 ##'
-##' Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
+##' Testing differences in transcript relative expression between genotype groups assumes homogeneity of the variances
 ##' in these groups. Testing this assumption is more complex and computationnally intensive but if needed the user
 ##' can choose to test for svQTL (splicing variability QTL), i.e. gene/SNPs where this assumption is violated,
 ##' by using the \code{svQTL = TRUE}. This test is run in parallel to the sQTL tests, but the computation time
@@ -55,15 +55,15 @@
 ##' are filtered out. Default is 10.
 ##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
 ##' @return a data.frame with columns
-##' \item{geneId}{the gene name}
-##' \item{snpId}{the SNP name}
-##' \item{F}{the F score}
-##' \item{nb.groups}{the number of genotype groups (2 or 3)}
-##' \item{md}{the maximum difference in relative expression between genotype groups (see Details)}
+##' \item{geneId}{the gene name.}
+##' \item{snpId}{the SNP name.}
+##' \item{F}{the F score.}
+##' \item{nb.groups}{the number of genotype groups (2 or 3).}
+##' \item{md}{the maximum difference in relative expression between genotype groups (see Details).}
 ##' \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
-##' \item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
-##' \item{pv}{the P-value}
-##' \item{nb.perms}{the number of permutations used for the P-value computation}
+##' \item{info}{comma separated list with the individuals per genotype group: -1,0,1,2.}
+##' \item{pv}{the P-value.}
+##' \item{nb.perms}{the number of permutations used for the P-value computation.}
 ##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
@@ -83,19 +83,47 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
       gr.gene <- GenomicRanges::resize(gr.gene, GenomicRanges::width(gr.gene) + 2 * genic.window, fix = "center")
     }
     if(length(gr.gene) > 0){
+      if(!is.null(covariates)){
+        if(!all(rownames(covariates) %in% colnames(tre.gene))){
+          stop("All samples should have covariate information (either a value or NA).")                  
+        }
+        cov.na <- apply(covariates, 1, function(x){any(is.na(x))})
+        covariates <- covariates[!cov.na, ]                                     
+        if(sum(cov.na) > 0){
+          warning(sprintf("%s samples with NA values for at least one covariate have been removed.", sum(cov.na)))     
+        }
+        if(sum(cov.na) > round(0.05 * nrow(covariates))){
+          stop("More than 5% of the samples contain NA values for at least one covariate")  
+        }
+      }
       ## Remove samples with non expressed genes
       tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
       ## Focus on common samples
       genotype.headers <- as.character(utils::read.table(genotype.f, as.is = TRUE, nrows = 1))
-      com.samples <- intersect(colnames(tre.gene), genotype.headers)
-      if(length(com.samples) == 0){
-        stop("No common samples between genotype and transcript ratios files.")
+      if(!is.null(covariates)){
+        com.samples <- Reduce(intersect, list(colnames(tre.gene), genotype.headers, covariates$sampleId))   
+        if (length(com.samples) == 0) {
+          stop("No common samples between genotype, covariate and transcript files.")
+        }
+      } else{
+        com.samples <- intersect(colnames(tre.gene), genotype.headers)
+        if (length(com.samples) == 0) {
+          stop("No common samples between genotype and transcript files.")
+        }
       }
-      tre.dist <- hellingerDist(tre.gene[, com.samples])
+      tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
+      tre.tc <- t(sqrt(tre.gene[,com.samples]))
+      tre.tc <- scale(tre.tc, center = T, scale = F)
+      colnames(tre.tc) <- tre.gene$tr
+      # Here regress covariates and keep residual if applies
+      if(!is.null(covariates)){
+        fit <- lm(tre.tc ~ ., data = covariates)
+        tre.tc <- fit$residual
+      }
       res.df <- data.frame()
       
-      if(GenomicRanges::width(gr.gene) > 20000 & is.null(ld.filter)){
-          pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), GenomicRanges::end(gr.gene), length.out = floor(GenomicRanges::width(gr.gene)/1e4) + 1)))
+      if(GenomicRanges::width(gr.gene) > 20000 && is.null(ld.filter)){
+          pos.breaks <- unique(round(seq(GenomicRanges::start(gr.gene), GenomicRanges::end(gr.gene), length.out = floor(GenomicRanges::width(gr.gene)/10000) + 1)))
           gr.gene.spl <- rep(gr.gene, length(pos.breaks) - 1)
           GenomicRanges::start(gr.gene.spl) <- pos.breaks[-length(pos.breaks)]
           pos.breaks[length(pos.breaks)] <- pos.breaks[length(pos.breaks)] + 1
@@ -108,10 +136,10 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
         res.range <- data.frame()
         if(verbose){message("  Sub-range ", ii)}
         genotype.gene <- read.bedix(genotype.f, gr.gene.spl[ii])
-        if(verbose & is.null(genotype.gene)){message("\tNo SNPs in the genomic range.")}
+        if(verbose && is.null(genotype.gene)){message("\tNo SNPs in the genomic range.")}
         if(!is.null(genotype.gene)){
-          ## Filter out SNPs with not enough power
-          snps.to.keep <- check.genotype(genotype.gene[,com.samples], tre.gene[, com.samples], min.nb.ind.geno = min.nb.ind.geno)
+          ## Filter out non-suitable SNPs 
+          snps.to.keep <- check.genotype(genotype.gene[, com.samples], tre.gene[, com.samples], min.nb.ind.geno = min.nb.ind.geno)
           if(verbose){
             snps.to.keep.t <- table(snps.to.keep)
             message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, sep = ": ", collapse=", "))
@@ -122,9 +150,9 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
               if(verbose){
                 message("\tLD filtering")
               }
-              genotype.gene <- LD.filter(genotype.gene = genotype.gene, com.samples = com.samples, tre.dist = tre.dist, th = ld.filter, svQTL = svQTL)
+              genotype.gene <- LD.filter(genotype.gene = genotype.gene, tre.mt = tre.tc, th = ld.filter)
             }
-            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.dist, tre.gene, svQTL = svQTL, qform = qform))
+            res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId), compFscore(., tre.tc, svQTL = svQTL, qform = qform))
           }
         }
         return(res.range)
@@ -139,13 +167,13 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, genic.window = 5000, min.n
           res.df$LD <- NULL
         }
         if(!qform){
-          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, approx = approx, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
+          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, approx = approx, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max)) 
         }
         if(svQTL){
-          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.dist, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
+          res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups), compPvalue(., tre.tc, svQTL = TRUE, min.nb.ext.scores = min.nb.ext.scores, nb.perm.max = nb.perm.max.svQTL))
         }
         if (!is.null(ld.filter)){
-          res.df <- merge(res.df, ld, by="snpId")
+          res.df <- merge(res.df, ld, by = "snpId")
         }
         res.df <- dplyr::arrange(res.df, pv)
         return(data.frame(done = TRUE, res.df))
