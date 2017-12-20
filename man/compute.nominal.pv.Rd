@@ -19,7 +19,7 @@ compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1,
 \item{item.acc}{accuracy for P-value computation. Passed to \code{pvcqf} function. Default is 1e-14.
 Minimum accuracy allowed is 1e-14.}
 
-\item{eigen.tol}{eigenvalues below this threshold are considered 0. Default = 1e-12.}
+\item{eigen.tol}{eigenvalues below this threshold are considered 0. Default is 1e-12.}
 }
 \value{
 A data.frame containing a P-value for the association.
