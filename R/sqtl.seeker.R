@@ -119,7 +119,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             }
             tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
-            tre.tc <- scale(tre.tc, center = T, scale = F)
+            # tre.tc <- scale(tre.tc, center = T, scale = F)
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
                fit <- lm(tre.tc ~ ., data = covariates)

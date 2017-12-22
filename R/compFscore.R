@@ -41,6 +41,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
     nb.gp <- nlevels(groups.snp.f)
     dfnum <- nb.gp - 1
     dfden <- n - dfnum - 1
+    tre.mt <- scale(tre.mt, center = T, scale = F)
     G <- tcrossprod(tre.mt)
     X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f),
                              contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    

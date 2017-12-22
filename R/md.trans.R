@@ -10,6 +10,7 @@
 ##' @keywords internal
 md.trans <- function(sr.o, groups.o)
 {
+    sr.o <- sr.o^2 # added
     mTrans <- apply(sr.o, 2, function(sr.r) tapply(sr.r, groups.o, mean, na.rm = TRUE))
     lr <- nrow(mTrans)
     ind1 <- rep(1:(lr-1), (lr-1):1)
