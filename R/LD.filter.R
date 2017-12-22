@@ -165,6 +165,7 @@ F.calc <- function(tre.mt, snp, svQTL = FALSE)
     } else {
         dfnum <- nlevels(snp.f) - 1
         dfden <- nrow(tre.mt) - dfnum - 1
+        tre.mt <- scale(tre.mt, center = T, scale = F)
         G <- tcrossprod(tre.mt)
         X <- stats::model.matrix(~., data = data.frame(genotype = snp.f), 
                                  contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    

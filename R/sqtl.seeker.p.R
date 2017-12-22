@@ -85,7 +85,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             }
             tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]                     
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
-            tre.tc <- scale(tre.tc, center = T, scale = F)
+            # tre.tc <- scale(tre.tc, center = T, scale = F)
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
                 fit <- lm(tre.tc ~ ., data = covariates)
@@ -174,6 +174,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
         tre.mt <- tre.mt[perm, ]
     }
     fit <- lm(tre.mt ~ groups.snp.f)
+    tre.mt <- scale(tre.mt, center = T, scale = F)
     G <- tcrossprod(tre.mt)
     X <- stats::model.matrix(fit) # Note contrast type
     H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
