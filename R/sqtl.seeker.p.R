@@ -64,7 +64,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                     warning(sprintf("%s samples with NA values for at least one covariate have been removed.", 
                                     sum(cov.na)))     
                 }
-                if(sum(cov.na) > round(0.05 * nrow(covariates))){
+                if(sum(cov.na) / nrow(covariates) > 0.05){
                     stop("More than 5% of the samples contain NA values for at least one covariate")  
                 }
             }
