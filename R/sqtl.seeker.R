@@ -119,7 +119,6 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             }
             tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
-            # tre.tc <- scale(tre.tc, center = T, scale = F)
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
                fit <- lm(tre.tc ~ ., data = covariates)
@@ -156,7 +155,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                         if(!is.null(ld.filter)){
                             if(verbose) message("\tLD filtering")
                             genotype.gene <- LD.filter(genotype.gene = genotype.gene,
-                                                       tre.mt = tre.tc, th = ld.filter)
+                                                       tre.mt = tre.tc, th = ld.filter,
+                                                       svQTL = svQTL)
                         }
                         res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId),
                                                compFscore(., tre.tc, svQTL = svQTL, 

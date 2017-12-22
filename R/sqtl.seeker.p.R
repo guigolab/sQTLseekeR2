@@ -85,7 +85,6 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             }
             tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]                     
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
-            # tre.tc <- scale(tre.tc, center = T, scale = F)
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
                 fit <- lm(tre.tc ~ ., data = covariates)
@@ -174,7 +173,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
         tre.mt <- tre.mt[perm, ]
     }
     fit <- lm(tre.mt ~ groups.snp.f)
-    tre.mt <- scale(tre.mt, center = T, scale = F)
+    tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
     G <- tcrossprod(tre.mt)
     X <- stats::model.matrix(fit) # Note contrast type
     H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
@@ -185,7 +184,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
     R <- fit$residuals
     df.e <- fit$df.residual
     df.i <- nlevels(groups.snp.f) - 1
-    e <- eigen(cov(R)*(n-1)/df.e, symmetric = T, only.values = T)$values
+    e <- eigen(cov(R)*(n-1)/df.e, symmetric = TRUE, only.values = TRUE)$values
     lambda <- abs(e[abs(e) > eigen.tol])
     pv.snp <- pcqf(q = f.tilde, lambda = lambda, 
                    df.i = df.i, df.e = df.e, acc = item.acc)
@@ -235,7 +234,7 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs,
     }
     variants.cis <- dim(genotype.gene)[1]
     genotype.gene <- LD.filter(genotype.gene = genotype.gene, tre.mt = tre.mt, 
-                               th = 1, tol = 0, tol.svqtl = NULL)             
+                               th = 1, tol = 0)             
     genotype.gene$LD <- NULL
     if (verbose) {
         message(sprintf("\tPASS not in perfect LD: %s", nrow(genotype.gene)))
@@ -283,5 +282,5 @@ compute.median.ld <- function(df)
             R[i, j] <- cor(M[i, ], M[j, ])^2
         }
     }
-    return(median(R, na.rm = T)) 
+    return(median(R, na.rm = TRUE)) 
 }

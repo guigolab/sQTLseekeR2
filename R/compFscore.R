@@ -41,7 +41,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
     nb.gp <- nlevels(groups.snp.f)
     dfnum <- nb.gp - 1
     dfden <- n - dfnum - 1
-    tre.mt <- scale(tre.mt, center = T, scale = F)
+    tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
     G <- tcrossprod(tre.mt)
     X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f),
                              contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
@@ -53,7 +53,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
     if (asympt) {
         fit <- lm(tre.mt ~ groups.snp.f)
         R <- fit$residuals
-        e <- eigen(cov(R)*(n-1)/dfden, symmetric = T, only.values = T)$values
+        e <- eigen(cov(R)*(n-1)/dfden, symmetric = TRUE, only.values = TRUE)$values
         lambda <- abs(e[abs(e) > 1e-12])
         item.acc <- 1e-14
         pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, 

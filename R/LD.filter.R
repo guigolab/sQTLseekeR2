@@ -17,8 +17,11 @@
 ##' in LD >= th and NA otherwise.
 ##' @author Diego Garrido-Martín
 ##' @keywords internal
-LD.filter <- function(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25)
+LD.filter <- function(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25, svQTL = FALSE)
 {
+    if (!svQTL){
+        tol.svqtl <- NULL
+    }
     if (th < 0 || th > 1 || !is.numeric(th)){
         stop ("'th' must be a numeric value in [0,1].")
     }
@@ -165,7 +168,7 @@ F.calc <- function(tre.mt, snp, svQTL = FALSE)
     } else {
         dfnum <- nlevels(snp.f) - 1
         dfden <- nrow(tre.mt) - dfnum - 1
-        tre.mt <- scale(tre.mt, center = T, scale = F)
+        tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
         G <- tcrossprod(tre.mt)
         X <- stats::model.matrix(~., data = data.frame(genotype = snp.f), 
                                  contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
