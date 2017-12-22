@@ -47,7 +47,7 @@ compPvalue <- function(res.df, tre.mt, min.nb.ext.scores = 1000,
         while( ( pv * nbP.tot < min.nb.ext.scores ) && ( nbP.tot < nb.perm.max ) ){
             nbP.new <- estNbPerm(pv, min.nb.ext.scores, nb.perm.max)
             if(nbP.new > 0){
-                FP <- vegan.null(tre.dist, nbP.new, nb.gp, svQTL = svQTL)
+                FP <- vegan.null(tre.mt, nbP.new, nb.gp, svQTL = svQTL)
                 F.nb.ext.FP <- F.nb.ext.FP + sum(F <= FP)
                 nbP.tot <- nbP.tot + nbP.new
                 pv <- (F.nb.ext.FP + 1) / (nbP.tot + 1)
