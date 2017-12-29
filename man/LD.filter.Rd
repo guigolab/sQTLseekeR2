@@ -18,7 +18,7 @@ LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25,
 
 \item{tol.svqtl}{same as \code{tol} for svQTL F score. Default is 0.25.}
 
-\item{svQTL}{should svQTL test be performed. Default is FALSE.}
+\item{svQTL}{should svQTL test be performed. Default is \code{FALSE}.}
 }
 \value{
 A data.frame with genotype info identical to \code{genotype.gene} with 

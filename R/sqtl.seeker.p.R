@@ -4,9 +4,9 @@
 ##' 
 ##' @title permuted sQTL seeker 
 ##' @param tre.df a data.frame with transcript relative expression
-##' produced by 'prepare.trans.exp'. Same as in \code{sqtl.seeker}.
+##' produced by \code{prepare.trans.exp}. Same as in \code{sqtl.seeker}.
 ##' @param genotype.f the name of the genotype file. This file needs to
-##' be ordered by position, compressed and indexed using 'index.genotype' or externally using tabix (samtools).
+##' be ordered by position, compressed and indexed using \code{index.genotype} or externally using tabix (samtools).
 ##' Must have column 'snpId'. Same as in \code{sqtl.seeker}.
 ##' @param gene.loc a data.frame with the genes location. Columns 'chr', 'start',
 ##' 'end' and 'geneId' are required. Same as in \code{sqtl.seeker}.
@@ -20,7 +20,7 @@
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
 ##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 ##' are filtered out. Default is 10.
-##' @param verbose Default is FALSE. 
+##' @param verbose Default is \code{FALSE}. 
 ##' @return A data.frame with columns:
 ##' \item{geneId}{the gene name.}
 ##' \item{variants.cis}{the number of variants tested in cis.}
@@ -154,7 +154,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
 ##' @title Compute nominal P-value
 ##' @param geno.df a data.frame of one row with the genotype information for each sample.
 ##' @param tre.mt a matrix of splicing ratios (samples x transcripts).
-##' @param permute should the rows of the splicing ratio matrix be permuted. Default is FALSE.
+##' @param permute should the rows of the splicing ratio matrix be permuted. Default is \code{FALSE}.
 ##' @param seed if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.
 ##' @param item.acc accuracy for P-value computation. Passed to \code{pcqf} function. Default is 1e-14.
 ##' Minimum accuracy allowed is 1e-14.
@@ -219,8 +219,8 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the smallest observed nominal P-value to allow the computation to stop. Default is 100. 
-##' @param comp.ld should linkage disequilibrium estimates be computed (median r2). Default is TRUE.
-##' @param verbose Default is FALSE.
+##' @param comp.ld should linkage disequilibrium estimates be computed (median r2). Default is \code{TRUE}.
+##' @param verbose Default is \code{FALSE}.
 ##' @return a data.frame with columns:
 ##' \item{variants.cis}{the number of variants tested in cis.}
 ##' \item{LD}{a linkage disequilibrium estimate for the genomic window (median r2).}

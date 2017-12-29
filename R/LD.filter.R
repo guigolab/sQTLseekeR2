@@ -12,7 +12,7 @@
 ##' @param th r2 threshold over which SNPs will be clustered. Default is 1.
 ##' @param tol maximum relative difference in sQTL F score allowed to group the SNPs. Default is 0.05.
 ##' @param tol.svqtl same as \code{tol} for svQTL F score. Default is 0.25. 
-##' @param svQTL should svQTL test be performed. Default is FALSE.
+##' @param svQTL should svQTL test be performed. Default is \code{FALSE}.
 ##' @return A data.frame with genotype info identical to \code{genotype.gene} with 
 ##' an additional column named LD, containing the IDs of the SNPs that fulfill the
 ##' criteria above and NA otherwise.

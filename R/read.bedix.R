@@ -5,7 +5,7 @@
 ##' It should be compressed with \code{bgzip} and indexed by tabix algorithm.
 ##' @param subset.reg a data.frame or GRanges object with the regions to subset from.
 ##' If a data.frame, it must have columns named 'chr', 'start' and 'end'.
-##' @param header should the first line of \code{file} be used as header. Default is TRUE.
+##' @param header should the first line of \code{file} be used as header. Default is \code{TRUE}.
 ##' @return a data.frame with the retrieved BED information.
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export

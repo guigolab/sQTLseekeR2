@@ -43,18 +43,18 @@
 ##' the highest true score to allow the computation to stop. Default is 1000.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1e6.
 ##' @param nb.perm.max.svQTL the maximum number of permutations for the svQTL computation. Default is 1e4.
-##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
+##' @param svQTL should svQTLs test be performed in addition to sQTLs. Default is \code{FALSE}. Warning:
 ##' computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 ##' considerably increase the running time.
 ##' @param asympt should the asymptotic null distribution be used to assess significance instead of permutations. 
 ##' The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
-##' Default is TRUE.
+##' Default is \code{TRUE}.
 ##' @param ld.filter Linkage disequilibrium threshold (r2) over which variants should be merged,
 ##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
-##' pseudo F scores will be merged. Default is NULL.  
+##' pseudo F scores will be merged. Default is \code{NULL}.  
 ##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 ##' are filtered out. Default is 10.
-##' @param verbose Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.
+##' @param verbose Should the gene IDs be outputed when analyzed. Default is \code{TRUE}. Mainly for debugging.
 ##' @return a data.frame with columns
 ##' \item{geneId}{the gene name.}
 ##' \item{snpId}{the SNP name.}
@@ -65,7 +65,7 @@
 ##' \item{info}{comma separated list with the individuals per genotype group: -1,0,1,2.}
 ##' \item{pv}{the P-value.}
 ##' \item{nb.perms}{the number of permutations used for the P-value computation.}
-##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
+##' \item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if \code{svQTL} is \code{TRUE}'.}
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
@@ -171,7 +171,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                         }
                         res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId),
                                                compFscore(., tre.tc, svQTL = svQTL, 
-                                                          asympt = asympt))
+                                                          asympt = asympt, 
+                                                          res = !is.null(covariates)))
                     }
                 }
                 return(res.range)

@@ -10,10 +10,10 @@ sqtl.seeker.p(tre.df, genotype.f, gene.loc, covariates = NULL,
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
-produced by 'prepare.trans.exp'. Same as in \code{sqtl.seeker}.}
+produced by \code{prepare.trans.exp}. Same as in \code{sqtl.seeker}.}
 
 \item{genotype.f}{the name of the genotype file. This file needs to
-be ordered by position, compressed and indexed using 'index.genotype' or externally using tabix (samtools).
+be ordered by position, compressed and indexed using \code{index.genotype} or externally using tabix (samtools).
 Must have column 'snpId'. Same as in \code{sqtl.seeker}.}
 
 \item{gene.loc}{a data.frame with the genes location. Columns 'chr', 'start',
@@ -23,8 +23,7 @@ Must have column 'snpId'. Same as in \code{sqtl.seeker}.}
 Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
 
-\item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
-Same as in \code{sqtl.seeker}.}
+\item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
 \item{nb.perm.min}{the minimum number of permutations. Default is 100.}
 
@@ -36,7 +35,7 @@ the lowest observed nominal P-value to allow the computation to stop. Default is
 \item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 are filtered out. Default is 10.}
 
-\item{verbose}{Default is TRUE.}
+\item{verbose}{Default is \code{FALSE}.}
 }
 \value{
 A data.frame with columns:

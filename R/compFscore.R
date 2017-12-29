@@ -3,10 +3,11 @@
 ##' @title F score computation
 ##' @param geno.df a data.frame of one row with the genotype information for each sample.
 ##' @param tre.mt a matrix with the transcript relative expression (samples x transcripts). 
-##' @param svQTL should svQTL test be performed in addition to sQTL. Default is FALSE.
+##' @param svQTL should svQTL test be performed in addition to sQTL. Default is \code{FALSE}.
 ##' @param asympt should significance for the F score (sQTL test) be computed using 
 ##' the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
-##' Default is TRUE.
+##' Default is \code{TRUE}.
+##' @param res is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}
 ##' @return A data.frame with columns:
 ##' \item{F}{the F score.}
 ##' \item{nb.groups}{the number of genotype groups.}
@@ -17,7 +18,7 @@
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
 ##' @import CompQuadForm
-compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
+compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE)
 {
     if(nrow(geno.df) > 1){
         stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
@@ -36,7 +37,12 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
     }
     info.snp <- paste(info.snp, collapse =",")
     groups.snp.f <- factor(as.numeric(geno.snp))
-    mdt <- md.trans(tre.mt, groups.snp.f)
+    if(res) {
+        tre.mt2md <- tre.mt
+    } else{ # w/o covariates, undo sqrt transf and keep original MD
+        tre.mt2md <- tre.mt^2 
+    }   
+    mdt <- md.trans(tre.mt2md, groups.snp.f)
     n <- nrow(tre.mt)
     nb.gp <- nlevels(groups.snp.f)
     dfnum <- nb.gp - 1

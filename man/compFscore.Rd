@@ -4,18 +4,20 @@
 \alias{compFscore}
 \title{F score computation}
 \usage{
-compFscore(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE)
+compFscore(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE)
 }
 \arguments{
 \item{geno.df}{a data.frame of one row with the genotype information for each sample.}
 
 \item{tre.mt}{a matrix with the transcript relative expression (samples x transcripts).}
 
-\item{svQTL}{should svQTL test be performed in addition to sQTL. Default is FALSE.}
+\item{svQTL}{should svQTL test be performed in addition to sQTL. Default is \code{FALSE}.}
 
 \item{asympt}{should significance for the F score (sQTL test) be computed using 
 the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
-Default is TRUE.}
+Default is \code{TRUE}.}
+
+\item{res}{is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}}
 }
 \value{
 A data.frame with columns:

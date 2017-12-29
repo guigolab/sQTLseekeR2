@@ -24,9 +24,9 @@ compute.empirical.pv(genotype.gene, tre.mt, best.snp, min.pv.obs,
 \item{min.nb.ext.scores}{the minimum number of permuted  nominal P-values lower than
 the smallest observed nominal P-value to allow the computation to stop. Default is 100.}
 
-\item{comp.ld}{should linkage disequilibrium estimates be computed (median r2). Default is TRUE.}
+\item{comp.ld}{should linkage disequilibrium estimates be computed (median r2). Default is \code{TRUE}.}
 
-\item{verbose}{Default is FALSE.}
+\item{verbose}{Default is \code{FALSE}.}
 }
 \value{
 a data.frame with columns:

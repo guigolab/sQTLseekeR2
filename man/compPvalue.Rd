@@ -17,7 +17,7 @@ compPvalue(res.df, tre.mt, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1e6.}
 
-\item{svQTL}{should svQTL test be performed instead of sQTL. Default is FALSE.}
+\item{svQTL}{should svQTL test be performed instead of sQTL. Default is \code{FALSE}.}
 }
 \value{
 An updated data.frame res.df with new columns 'pv' and 'nb.perms'.

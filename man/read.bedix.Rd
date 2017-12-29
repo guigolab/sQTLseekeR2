@@ -13,7 +13,7 @@ It should be compressed with \code{bgzip} and indexed by tabix algorithm.}
 \item{subset.reg}{a data.frame or GRanges object with the regions to subset from.
 If a data.frame, it must have columns named 'chr', 'start' and 'end'.}
 
-\item{header}{should the first line of \code{file} be used as header. Default is TRUE.}
+\item{header}{should the first line of \code{file} be used as header. Default is \code{TRUE}.}
 }
 \value{
 a data.frame with the retrieved BED information.

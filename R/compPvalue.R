@@ -7,7 +7,7 @@
 ##' @param min.nb.ext.scores the minimum number of permuted scores higher than
 ##' 'F.lead' to allow the computation to stop. Default is 1000.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1e6.
-##' @param svQTL should svQTL test be performed instead of sQTL. Default is FALSE.
+##' @param svQTL should svQTL test be performed instead of sQTL. Default is \code{FALSE}.
 ##' @return An updated data.frame res.df with new columns 'pv' and 'nb.perms'.
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal

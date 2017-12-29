@@ -12,7 +12,7 @@ compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1,
 
 \item{tre.mt}{a matrix of splicing ratios (samples x transcripts).}
 
-\item{permute}{should the rows of the splicing ratio matrix be permuted. Default is FALSE.}
+\item{permute}{should the rows of the splicing ratio matrix be permuted. Default is \code{FALSE}.}
 
 \item{seed}{if \code{permute} is TRUE, value provided to \code{\link{set.seed}}. Default is 1.}
 
