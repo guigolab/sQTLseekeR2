@@ -14,14 +14,13 @@
 ##' Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 ##' When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
-##' Same as in \code{sqtl.seeker}.
 ##' @param min.nb.ext.scores the minimum number of permuted  nominal P-values lower than
 ##' the lowest observed nominal P-value to allow the computation to stop. Default is 100. 
 ##' @param nb.perm.min the minimum number of permutations. Default is 100.
 ##' @param nb.perm.max the maximum number of permutations. Default is 1000. 
 ##' @param min.nb.ind.geno SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 ##' are filtered out. Default is 10.
-##' @param verbose Default is TRUE. 
+##' @param verbose Default is FALSE. 
 ##' @return A data.frame with columns:
 ##' \item{geneId}{the gene name.}
 ##' \item{variants.cis}{the number of variants tested in cis.}
@@ -37,6 +36,7 @@
 ##' @author Diego Garrido-Martín
 ##' @export
 ##' @import fitdistrplus
+##' @import car
 sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
                           genic.window = 5000, nb.perm.min = 100, 
                           nb.perm.max = 1000, min.nb.ext.scores = 100, 

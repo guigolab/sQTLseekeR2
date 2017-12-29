@@ -4,17 +4,18 @@
 ##' \itemize{
 ##' \item{LD (r2) >= \code{th}.}
 ##' \item{Relative differences in sQTL F score <= \code{tol}}
-##' \item{Relative differences in svQTL F score <= \code{tol.svqtl}}}
+##' \item{Relative differences in svQTL F score <= \code{tol.svqtl} (if \code{svQTL} is \code{TRUE})}
+##' }
 ##' @title Linkage disequilibrium (LD) filter
 ##' @param genotype.gene a data.frame with genotype info produced by 'read.bedix'.
 ##' @param tre.mt a matrix of transcript relative expression (samples x transcripts).
 ##' @param th r2 threshold over which SNPs will be clustered. Default is 1.
 ##' @param tol maximum relative difference in sQTL F score allowed to group the SNPs. Default is 0.05.
 ##' @param tol.svqtl same as \code{tol} for svQTL F score. Default is 0.25. 
-##' If it is NULL, the svQTL test is not performed.
+##' @param svQTL should svQTL test be performed. Default is FALSE.
 ##' @return A data.frame with genotype info identical to \code{genotype.gene} with 
-##' an additional column named LD, containing the IDs of the SNPs that are 
-##' in LD >= th and NA otherwise.
+##' an additional column named LD, containing the IDs of the SNPs that fulfill the
+##' criteria above and NA otherwise.
 ##' @author Diego Garrido-Martín
 ##' @keywords internal
 LD.filter <- function(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25, svQTL = FALSE)

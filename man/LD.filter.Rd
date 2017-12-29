@@ -4,7 +4,8 @@
 \alias{LD.filter}
 \title{Linkage disequilibrium (LD) filter}
 \usage{
-LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25)
+LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25,
+  svQTL = FALSE)
 }
 \arguments{
 \item{genotype.gene}{a data.frame with genotype info produced by 'read.bedix'.}
@@ -15,13 +16,14 @@ LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25)
 
 \item{tol}{maximum relative difference in sQTL F score allowed to group the SNPs. Default is 0.05.}
 
-\item{tol.svqtl}{same as \code{tol} for svQTL F score. Default is 0.25. 
-If it is NULL, the svQTL test is not performed.}
+\item{tol.svqtl}{same as \code{tol} for svQTL F score. Default is 0.25.}
+
+\item{svQTL}{should svQTL test be performed. Default is FALSE.}
 }
 \value{
 A data.frame with genotype info identical to \code{genotype.gene} with 
-an additional column named LD, containing the IDs of the SNPs that are 
-in LD >= th and NA otherwise.
+an additional column named LD, containing the IDs of the SNPs that fulfill the
+criteria above and NA otherwise.
 }
 \description{
 Group SNPs according to their LD.
@@ -31,7 +33,8 @@ Clusters the SNP IDs of those variants that fulfill the following criteria:
 \itemize{
 \item{LD (r2) >= \code{th}.}
 \item{Relative differences in sQTL F score <= \code{tol}}
-\item{Relative differences in svQTL F score <= \code{tol.svqtl}}}
+\item{Relative differences in svQTL F score <= \code{tol.svqtl} (if \code{svQTL} is \code{TRUE})}
+}
 }
 \author{
 Diego Garrido-Martín

@@ -69,6 +69,7 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
+##' @import car
 sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
                         genic.window = 5000, min.nb.ext.scores = 1000, 
                         nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, 
