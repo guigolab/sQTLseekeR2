@@ -122,6 +122,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
+                covariates <- covariates[com.samples, ]
                 fit <- lm(tre.tc ~ ., data = covariates)
                 vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
                 if (verbose){
