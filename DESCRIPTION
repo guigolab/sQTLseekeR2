@@ -21,6 +21,7 @@ Imports:
     data.table,
     tidyr,
     CompQuadForm,
-    fitdistrplus
+    fitdistrplus,
+    car
 biocViews:
 RoxygenNote: 6.0.1
