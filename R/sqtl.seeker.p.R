@@ -90,12 +90,12 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                 fit <- lm(tre.tc ~ ., data = covariates)
                 vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
                 if (verbose){
-                  message("\t", "Covariates VIF - ", 
-                          paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                    message("\t", "Covariates VIF - ", 
+                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
                 }
                 if (any(vifs > 5)){
-                  warning("Check multicollinearity. VIF > 5 for some covariates:", "\n",
-                          paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                    warning("Check multicollinearity. VIF > 5 for some covariates:", "\n",
+                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
                 }
                 tre.tc <- fit$residual
             }
