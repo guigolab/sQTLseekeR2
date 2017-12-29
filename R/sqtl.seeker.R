@@ -107,7 +107,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                                                                as.is = TRUE, nrows = 1))
             if(!is.null(covariates)){
                 com.samples <- Reduce(intersect, list(colnames(tre.gene),
-                                                      genotype.headers, covariates$sampleId))   
+                                                      genotype.headers, rownames(covariates)))   
                 if (length(com.samples) == 0) {
                     stop("No common samples between genotype, covariate and transcript files.")
                 }
@@ -121,8 +121,17 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
-               fit <- lm(tre.tc ~ ., data = covariates)
-               tre.tc <- fit$residual
+                fit <- lm(tre.tc ~ ., data = covariates)
+                vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
+                if (verbose){
+                    message("\t", "Covariates VIF - ", 
+                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                }
+                if (any(vifs > 5)){
+                    warning("Check multicollinearity. VIF > 5 for some covariates:", "\n",
+                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                }
+                tre.tc <- fit$residual
             }
             res.df <- data.frame()
             if(GenomicRanges::width(gr.gene) > 20000 && is.null(ld.filter)){
