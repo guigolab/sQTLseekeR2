@@ -83,7 +83,14 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                     stop("No common samples between genotype and transcript files.")
                 }
             }
-            tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]                     
+            tre.gene <- tre.gene[, c("trId", "geneId", com.samples)]
+            allzero <- apply(tre.gene[, com.samples], 1, function(x){ sum(x) == 0 })
+            if (any(allzero)){
+              tr.out <- tre.gene$trId[allzero]
+              tre.gene <- tre.gene[!allzero,]
+              warning(sprintf("Transcript(s) %s is(are) removed due to zero expression in all common samples.", 
+                              paste(tr.out, collapse = ", ")) )
+            }
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
