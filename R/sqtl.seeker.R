@@ -130,6 +130,12 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
                 covariates <- covariates[com.samples, ]
+                multiclass <- apply(covariates, 2, function(x){length(table(x)) > 1})
+                covariates <- covariates[, multiclass]
+                if (verbose){
+                  message("\t", "Covariates removed due to only one value: ", 
+                          paste(names(multiclass)[!multiclass], collapse = ", "))
+                }
                 fit <- lm(tre.tc ~ ., data = covariates)
                 vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
                 if (verbose){
