@@ -59,7 +59,7 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                     stop("All samples should have covariate information (either a value or NA).")                  
                 }
                 cov.na <- apply(covariates, 1, function(x){any(is.na(x))})
-                covariates <- covariates[!cov.na, ]                                     
+                covariates <- covariates[!cov.na, , drop = FALSE]                                     
                 if(sum(cov.na) > 0){
                     warning(sprintf("%s samples with NA values for at least one covariate have been removed.", 
                                     sum(cov.na)))     
@@ -94,22 +94,24 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
             tre.tc <- t(sqrt(tre.gene[, com.samples]))
             colnames(tre.tc) <- tre.gene$tr
             if(!is.null(covariates)){
-                covariates <- covariates[com.samples, ]
+                covariates <- covariates[com.samples, , drop = FALSE]
                 multiclass <- apply(covariates, 2, function(x){length(table(x)) > 1})
-                covariates <- covariates[, multiclass]
+                covariates <- covariates[, multiclass, drop = FALSE]
                 if (verbose){
                   message("\t", "Covariates removed due to only one value: ", 
                           paste(names(multiclass)[!multiclass], collapse = ", "))
                 }
                 fit <- lm(tre.tc ~ ., data = covariates)
-                vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
-                if (verbose){
-                    message("\t", "Covariates VIF - ", 
-                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
-                }
-                if (any(vifs > 5)){
-                    warning("Check multicollinearity. VIF > 5 for some covariates:", "\n",
-                            paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                if (ncol(covariates) > 1){
+                    vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
+                    if (verbose){
+                        message("\t", "Covariates VIF - ", 
+                                paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                    }
+                    if (any(vifs > 5)){
+                        warning("Check multicollinearity. VIF > 5 for some covariates:", "\n",
+                                paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
+                    }
                 }
                 tre.tc <- fit$residual
             }
