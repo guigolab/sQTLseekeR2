@@ -6,7 +6,7 @@ Date: 2018-03-02
 Author: Diego Garrido-Martín, Jean Monlong, Ferran Reverter, Miquel Calvo, Roderic Guigo.
 Maintainer: Diego Garrido-Martín <dgarrimar@gmail.com>
 Description: sQTLseekeR2 package
-License: GPL-2
+License: GPL-3
 Encoding: UTF-8
 Imports:
     vegan,
