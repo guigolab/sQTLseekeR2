@@ -4,7 +4,7 @@ Title: Splicing QTL discovery tool
 Version: 0.2.1
 Date: 2018-03-02
 Author: Diego Garrido-Martín, Jean Monlong, Ferran Reverter, Miquel Calvo, Roderic Guigo.
-Maintainer: Diego Garrido-Martín <dgarrimar@gmail.com>
+Maintainer: Diego Garrido-Martín <diego.garrido@crg.eu>
 Description: sQTLseekeR2 package
 License: GPL-3
 Encoding: UTF-8
