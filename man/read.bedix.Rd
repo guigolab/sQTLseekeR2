@@ -4,27 +4,23 @@
 \alias{read.bedix}
 \title{Retrieve a subset of an indexed BED file}
 \usage{
-read.bedix(file, subset.reg = NULL, header = TRUE, as.is = TRUE)
+read.bedix(file, subset.reg = NULL, header = TRUE)
 }
 \arguments{
-\item{file}{the name of the file which the data are to be read from.
-Should be compressed with \code{bgzip} and indexed by tabix algorithm.}
+\item{file}{a BED file containing the data to be read.
+It should be compressed with \code{bgzip} and indexed by tabix algorithm.}
 
 \item{subset.reg}{a data.frame or GRanges object with the regions to subset from.
 If a data.frame, it must have columns named 'chr', 'start' and 'end'.}
 
-\item{header}{Should the first line be used as headers. Default is TRUE.}
-
-\item{as.is}{controls the conversion of columns. Default is TRUE, i.e. columns are
-converted into 'character', 'numeric', 'integer', etc. If FALSE, some columns might
-be converted into factors (e.g. 'character' columns).}
+\item{header}{should the first line of \code{file} be used as header. Default is \code{TRUE}.}
 }
 \value{
 a data.frame with the retrieved BED information.
 }
 \description{
 Using \code{Rsamtools} functions to manipulate tabix file, the indexed BED file is read
-and only regions defined by the desired subset are retrieved.
+and the features present in the selected region are retrieved.
 }
 \author{
 Jean Monlong, Diego Garrido-Martín

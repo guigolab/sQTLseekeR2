@@ -4,18 +4,15 @@
 \alias{md.trans}
 \title{MaxDiff splicing ratios computation}
 \usage{
-md.trans(sr.o, groups.o, samples)
+md.trans(sr.o, groups.o)
 }
 \arguments{
-\item{sr.o}{a matrix or data.frame with the transcript relative expression.}
+\item{sr.o}{a matrix with the transcript relative expression (samples x transcripts).}
 
-\item{groups.o}{a factor with the genotype groups for each sample.}
-
-\item{samples}{a vector with the names of samples used in the genotype
-groups information.}
+\item{groups.o}{a factor with the genotype for each sample.}
 }
 \value{
-a list with:
+A list with:
 \item{md}{the maximum difference in splicing ratios between genotype groups.}
 \item{tr.first, tr.second}{the two transcripts that change the most.}
 }
@@ -24,6 +21,6 @@ Compute the maximum difference in transcript relative expression
 between genotype groups.
 }
 \author{
-Jean Monlong
+Jean Monlong, Diego Garrido-Martín
 }
 \keyword{internal}

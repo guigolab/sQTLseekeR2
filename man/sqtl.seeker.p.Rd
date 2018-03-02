@@ -4,37 +4,42 @@
 \alias{sqtl.seeker.p}
 \title{permuted sQTL seeker}
 \usage{
-sqtl.seeker.p(tre.df, genotype.f, gene.loc, genic.window = 5000,
-  min.nb.ext.scores = 100, nb.perm.max = 1000, min.nb.ind.geno = 10,
-  verbose = FALSE)
+sqtl.seeker.p(tre.df, genotype.f, gene.loc, covariates = NULL,
+  genic.window = 5000, nb.perm.min = 100, nb.perm.max = 1000,
+  min.nb.ext.scores = 100, min.nb.ind.geno = 10, verbose = FALSE)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
-produced by 'prepare.trans.exp'. Same as in \code{sqtl.seeker}.}
+produced by \code{prepare.trans.exp}. Same as in \code{sqtl.seeker}.}
 
 \item{genotype.f}{the name of the genotype file. This file needs to
-be ordered by position, compressed and indexed using 'index.genotype' or externally using tabix (samtools).
+be ordered by position, compressed and indexed using \code{index.genotype} or externally using tabix (samtools).
 Must have column 'snpId'. Same as in \code{sqtl.seeker}.}
 
 \item{gene.loc}{a data.frame with the genes location. Columns 'chr', 'start',
 'end' and 'geneId' are required. Same as in \code{sqtl.seeker}.}
 
-\item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
-Same as in \code{sqtl.seeker}.}
+\item{covariates}{a data.frame with covariate information per sample (samples x covariates).
+Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
+When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
+
+\item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
+
+\item{nb.perm.min}{the minimum number of permutations. Default is 100.}
+
+\item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
 
 \item{min.nb.ext.scores}{the minimum number of permuted  nominal P-values lower than
 the lowest observed nominal P-value to allow the computation to stop. Default is 100.}
 
-\item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
-
 \item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 are filtered out. Default is 10.}
 
-\item{verbose}{Default is TRUE. Mainly for debugging.}
+\item{verbose}{Default is \code{FALSE}.}
 }
 \value{
-a data.frame with columns:
-\item{geneId}{the gene name}
+A data.frame with columns:
+\item{geneId}{the gene name.}
 \item{variants.cis}{the number of variants tested in cis.}
 \item{LD}{a linkage disequilibrium estimate for the genomic window (median r2).}
 \item{best.snp}{ID of the SNP with the smallest observed nominal P-value.}

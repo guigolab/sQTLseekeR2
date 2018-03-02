@@ -2,7 +2,7 @@
 % Please edit documentation in R/prepare.trans.exp.R
 \name{nbDiffPt}
 \alias{nbDiffPt}
-\title{Number of different splicing ratio points}
+\title{Number of non-identical splicing ratio points}
 \usage{
 nbDiffPt(sr)
 }
@@ -10,11 +10,11 @@ nbDiffPt(sr)
 \item{sr}{a data.frame with the splicing ratios (transcript x sample).}
 }
 \value{
-the number of different splicing ratios.
+the number of non-identical splicing ratios.
 }
 \description{
-Compute the number of different splicing ratios. Too few splicing ratios is
-a concern for the permutation process. Indeed if many samples exactly the same
+Compute the number of non-identical splicing ratios. Too few splicing ratios are
+problematic for the permutation process. If many samples have exactly the same
 splicing ratios, the permutation might create many identical permuted F scores.
 }
 \author{

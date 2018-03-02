@@ -4,41 +4,37 @@
 \alias{LD.filter}
 \title{Linkage disequilibrium (LD) filter}
 \usage{
-LD.filter(genotype.gene, com.samples, tre.dist, th = 1, tol = 0.05,
+LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25,
   svQTL = FALSE)
 }
 \arguments{
 \item{genotype.gene}{a data.frame with genotype info produced by 'read.bedix'.}
 
-\item{com.samples}{a character vector with the common sample names between the genotype
-and transcript relative expression files.}
+\item{tre.mt}{a matrix of transcript relative expression (samples x transcripts).}
 
-\item{tre.dist}{a distance object from the transcript relative expression.}
+\item{th}{r2 threshold over which SNPs will be clustered. Default is 1.}
 
-\item{th}{r2 threshold over which SNPs will be merged. Default is 1.}
+\item{tol}{maximum relative difference in sQTL F score allowed to group the SNPs. Default is 0.05.}
 
-\item{svQTL}{\code{LD.filter} only merges the SNP IDs if the LD r2 is higher than
-\code{th} and the F scores for the eQTL test differ no more than a 5\%. If svQTL = TRUE, 
-it also requires that the F scores for the svQTL test differ no more than the 20\%. Default is TRUE.}
+\item{tol.svqtl}{same as \code{tol} for svQTL F score. Default is 0.25.}
+
+\item{svQTL}{should svQTL test be performed. Default is \code{FALSE}.}
 }
 \value{
-a data.frame with columns:
-\item{F}{the F score.}
-\item{nb.groups}{the number of groups created by the genotypes.}
-\item{md}{the maximum difference in splicing ratios between genotype groups.}
-\item{tr.first, tr.second}{the two transcripts that change the most.}
-\item{pv}{if \code{qform = TRUE} a P-value for the F score is computed}
-\item{LD}{IDs of the SNPs that are in LD >= th, NA otherwise}
+A data.frame with genotype info identical to \code{genotype.gene} with 
+an additional column named LD, containing the IDs of the SNPs that fulfill the
+criteria above and NA otherwise.
 }
 \description{
-Groups SNPs according to LD.
+Group SNPs according to their LD.
 }
 \details{
-Merges the SNP IDs of those variants that fulfill the following criteria:
+Clusters the SNP IDs of those variants that fulfill the following criteria:
 \itemize{
-\item{LD (r2) >= than a given user-defined threshold.}
-\item{Relative differences in sQTL F score <= 0.05}
-\item{(if svQTL = TRUE) Relative differences in sQTL F score <= 0.05}}
+\item{LD (r2) >= \code{th}.}
+\item{Relative differences in sQTL F score <= \code{tol}}
+\item{Relative differences in svQTL F score <= \code{tol.svqtl} (if \code{svQTL} is \code{TRUE})}
+}
 }
 \author{
 Diego Garrido-Martín

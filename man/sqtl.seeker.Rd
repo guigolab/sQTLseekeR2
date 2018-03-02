@@ -4,9 +4,9 @@
 \alias{sqtl.seeker}
 \title{sQTL seeker}
 \usage{
-sqtl.seeker(tre.df, genotype.f, gene.loc, genic.window = 5000,
-  min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  nb.perm.max.svQTL = 10000, svQTL = FALSE, approx = TRUE, qform = TRUE,
+sqtl.seeker(tre.df, genotype.f, gene.loc, covariates = NULL,
+  genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
+  nb.perm.max.svQTL = 10000, svQTL = FALSE, asympt = TRUE,
   ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
 }
 \arguments{
@@ -20,6 +20,10 @@ Must have column 'snpId'.}
 \item{gene.loc}{a data.frame with the genes location. Columns 'chr', 'start',
 'end' and 'geneId' are required.}
 
+\item{covariates}{a data.frame with covariate information per sample (samples x covariates).
+Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
+When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
+
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
 \item{min.nb.ext.scores}{the minimum number of permuted score higher than
@@ -29,44 +33,41 @@ the highest true score to allow the computation to stop. Default is 1000.}
 
 \item{nb.perm.max.svQTL}{the maximum number of permutations for the svQTL computation. Default is 1e4.}
 
-\item{svQTL}{should svQTLs test be performed in addition to sQTLs. Default is FALSE. Warning:
+\item{svQTL}{should svQTLs test be performed in addition to sQTLs. Default is \code{FALSE}. Warning:
 computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 considerably increase the running time.}
 
-\item{approx}{should the asymptotic distribution be used instead of permutations.
-Default is TRUE.}
-
-\item{qform}{should \code{\link[CompQuadForm]{davies}} function in the \code{CompQuadForm} package be 
-used to compute P-values. This requires \code{approx = TRUE}. It reduces the precission limit up to \code{1e-14}, 
-but slightly increases the computation time. Default is TRUE.}
+\item{asympt}{should the asymptotic null distribution be used to assess significance instead of permutations. 
+The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
+Default is \code{TRUE}.}
 
 \item{ld.filter}{Linkage disequilibrium threshold (r2) over which variants should be merged,
 so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
-pseudo F scores will be merged. Default is NULL.}
+pseudo F scores will be merged. Default is \code{NULL}.}
 
 \item{min.nb.ind.geno}{SNPs with less samples than \code{min.nb.ind.geno} in any genotype group
 are filtered out. Default is 10.}
 
-\item{verbose}{Should the gene IDs be outputed when analyzed. Default is TRUE. Mainly for debugging.}
+\item{verbose}{Should the gene IDs be outputed when analyzed. Default is \code{TRUE}. Mainly for debugging.}
 }
 \value{
 a data.frame with columns
-\item{geneId}{the gene name}
-\item{snpId}{the SNP name}
-\item{F}{the F score}
-\item{nb.groups}{the number of genotype groups (2 or 3)}
-\item{md}{the maximum difference in relative expression between genotype groups (see Details)}
+\item{geneId}{the gene name.}
+\item{snpId}{the SNP name.}
+\item{F}{the F score.}
+\item{nb.groups}{the number of genotype groups (2 or 3).}
+\item{md}{the maximum difference in relative expression between genotype groups (see Details).}
 \item{tr.first/tr.second}{the transcript IDs of the two transcripts that change the most (and symetrically).}
-\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2}
-\item{pv}{the P-value}
-\item{nb.perms}{the number of permutations used for the P-value computation}
-\item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if 'svQTL=TRUE'.}
+\item{info}{comma separated list with the individuals per genotype group: -1,0,1,2.}
+\item{pv}{the P-value.}
+\item{nb.perms}{the number of permutations used for the P-value computation.}
+\item{F.svQTL/pv.svQTL/nb.perms.svQTL}{idem for svQTLs, if \code{svQTL} is \code{TRUE}'.}
 \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 }
 \description{
 \code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
-file, indexed by function \code{index.genotype}, association between each SNP and the transcript relative
+file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
 potentially false sQTL (see Details).
 }
@@ -78,7 +79,7 @@ filters remove SNP with:
 \item{less than min.nb.ind.geno samples in any genotype group}
 \item{less than 5 different splicing pattern (needed for permutation efficiency) in any genotype group}}
 
-Testing difference in transcript relative expression between genotype groups assumes homogeneity of the variances
+Testing differences in transcript relative expression between genotype groups assumes homogeneity of the variances
 in these groups. Testing this assumption is more complex and computationnally intensive but if needed the user
 can choose to test for svQTL (splicing variability QTL), i.e. gene/SNPs where this assumption is violated,
 by using the \code{svQTL = TRUE}. This test is run in parallel to the sQTL tests, but the computation time

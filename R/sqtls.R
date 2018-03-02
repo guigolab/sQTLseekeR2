@@ -25,54 +25,55 @@
 ##' @return a subset of the input data.frame with only significant sQTLs and FDR estimates.
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-sqtls <- function(res.df, FDR = 0.05, method = "BH", md.min = 0.05, out.pdf = NULL, svQTL.removal = TRUE, FDR.svQTL = 0.05){
-  pv <- md <- NULL ## Uglily suppress R checks for ggplot2
-  
-  if (method == "BH"){
-    res.df$fdr <- stats::p.adjust(res.df$pv, method = "BH")
-  }else if (method == "qvalue"){
-    res.df$fdr <- qvalue::qvalue(res.df$pv)$qvalues
-  }else{
-    stop("Available methods for FDR are 'BH' and 'qvalue'.")
-  }
-  
-  if(!is.null(out.pdf)){
-    grDevices::pdf(out.pdf, 8, 6)
-    suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(x = pv)) +
-          ggplot2::geom_histogram() + ggplot2::theme_bw() + 
-          ggplot2::xlab("P-value") + ggplot2::ylab("number of gene/SNP pairs")
-          ))
-  }
-  
-  if(any(colnames(res.df)=="pv.svQTL")){
+sqtls <- function(res.df, FDR = 0.05, method = "BH", md.min = 0.05, 
+                  out.pdf = NULL, svQTL.removal = TRUE, FDR.svQTL = 0.05)
+{
+    pv <- md <- NULL ## Uglily suppress R checks for ggplot2
     if (method == "BH"){
-      res.df$fdr.svQTL <- stats::p.adjust(res.df$pv.svQTL, method = "BH")
-    }else if (method == "qvalue"){
-      res.df$fdr.svQTL <- qvalue::qvalue(res.df$pv.svQTL)$qvalues
+        res.df$fdr <- stats::p.adjust(res.df$pv, method = "BH")
+    } else if (method == "qvalue"){
+        res.df$fdr <- qvalue::qvalue(res.df$pv)$qvalues
+    } else{
+        stop("Available methods for FDR are 'BH' and 'qvalue'.")
     }
-    if(svQTL.removal){
-      res.df <- res.df[which(res.df$fdr.svQTL >= FDR.svQTL), ]
-      if(!is.null(out.pdf)){
+    if(!is.null(out.pdf)){
+        grDevices::pdf(out.pdf, 8, 6)
         suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(x = pv)) +
-              ggplot2::geom_histogram() + ggplot2::theme_bw() +
-              ggplot2::xlab("P-value") + ggplot2::ylab("number of gene/SNP pairs") +
-              ggplot2::ggtitle("After svQTL removal")
-              ))
-      }
+                                 ggplot2::geom_histogram() + ggplot2::theme_bw() +
+                                 ggplot2::xlab("P-value") + ggplot2::ylab("number of gene/SNP pairs")
+                               ))
     }
-  }
-
-  res.df = res.df[which(res.df$fdr <= FDR & res.df$md >= md.min), ]
-  rownames(res.df) = NULL
-
-  if(!is.null(out.pdf)){
-    if(nrow(res.df)>0){
-      suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(y = -log10(pv), x = md)) +
-            ggplot2::geom_bin2d(bins = 200) + ggplot2::theme_bw() +
-            ggplot2::ylab(expression('-log'[10]*' P-value')) + ggplot2::xlab("MD (Maximum difference in relative expression)")
-            ))
+    if(any(colnames(res.df)=="pv.svQTL")){
+        if (method == "BH"){
+            res.df$fdr.svQTL <- stats::p.adjust(res.df$pv.svQTL, method = "BH")
+        } else if (method == "qvalue"){
+           res.df$fdr.svQTL <- qvalue::qvalue(res.df$pv.svQTL)$qvalues
+        }
+        if(svQTL.removal){
+            res.df <- res.df[which(res.df$fdr.svQTL >= FDR.svQTL), ]
+            if(!is.null(out.pdf)){
+                suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(x = pv)) +
+                                         ggplot2::geom_histogram() + 
+                                         ggplot2::theme_bw() +
+                                         ggplot2::xlab("P-value") + 
+                                         ggplot2::ylab("number of gene/SNP pairs") +
+                                         ggplot2::ggtitle("After svQTL removal")
+                                       ))
+            }
+        }
     }
-    grDevices::dev.off()
-  }
-  return(res.df)
+    res.df = res.df[which(res.df$fdr <= FDR & res.df$md >= md.min), ]
+    rownames(res.df) = NULL
+    if(!is.null(out.pdf)){
+        if(nrow(res.df)>0){
+            suppressWarnings(print(ggplot2::ggplot(res.df, ggplot2::aes(y = -log10(pv), x = md)) +
+                                     ggplot2::geom_bin2d(bins = 200) + 
+                                     ggplot2::theme_bw() +
+                                     ggplot2::ylab(expression('-log'[10]*' P-value')) + 
+                                     ggplot2::xlab("MD (Maximum difference in relative expression)") 
+                                   ))
+        }
+        grDevices::dev.off()
+    }
+    return(res.df)
 }

@@ -8,22 +8,24 @@
 ##' @return the name of the indexed genotype file.
 ##' @author Jean Monlong
 ##' @export
-index.genotype <- function(file){
-  if(!file.exists(file)){
-    stop("File not found: ", file)
-  }
-
-  ## Check column names and order
-  snp50 = utils::read.table(file, sep="\t", header=TRUE, quote = "", comment.char = "", as.is = TRUE, nrows = 50)
-  if(!all(colnames(snp50)[1:4] == c("chr","start","end","snpId"))){
-    stop("Missing column or in incorrect order. The first 4 columns must be 'chr', 'start', 'end' and 'snpId'.")
-  }
-  ## Check that genotypes are discrete
-  if(length(unique(unlist(snp50[, -(1:4)]))) > 10){
-    stop("Discrete genotypes are required but the inputed genotypes look continuous.")
-  }
-  
-  file.final <- Rsamtools::bgzip(file, dest = paste0(sub(".gz", "", file), ".bgz"), overwrite = TRUE)
-  Rsamtools::indexTabix(file.final, format = "bed")
-  return(file.final)
+index.genotype <- function(file)
+{
+    if(!file.exists(file)){
+        stop("File not found: ", file)
+    }
+    ## Check column names and order
+    snp50 = utils::read.table(file, sep="\t", header=TRUE, quote = "", 
+                              comment.char = "", as.is = TRUE, nrows = 50)
+    if(!all(colnames(snp50)[1:4] == c("chr","start","end","snpId"))){
+        stop("Missing column or in incorrect order. The first 4 columns must be 'chr', 'start', 'end' and 'snpId'.")
+    }
+    ## Check that genotypes are discrete
+    if(length(unique(unlist(snp50[, -(1:4)]))) > 10){
+        stop("Discrete genotypes are required but the inputed genotypes look continuous.")
+    }
+    file.final <- Rsamtools::bgzip(file, 
+                                   dest = paste0(sub(".gz", "", file), ".bgz"), 
+                                   overwrite = TRUE)
+    Rsamtools::indexTabix(file.final, format = "bed")
+    return(file.final)
 }

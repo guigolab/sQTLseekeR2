@@ -7,10 +7,10 @@
 relativize(x, min.gene.exp = 0.01)
 }
 \arguments{
-\item{x}{a vector with of transcript expression}
+\item{x}{a vector of transcript expression.}
 
 \item{min.gene.exp}{the minimum gene expression in the sample. If the
-gene expression if too low it is usually safer to remove from the
+gene expression is too low it is safer to remove the sample from the
 analysis.}
 }
 \value{

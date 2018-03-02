@@ -29,57 +29,54 @@
 ##' @return a data.frame with the columns of sqtl.seeker and sqtl.seeker.p outputs with the significant sQTLs.
 ##' @author Diego Garrido-Martín
 ##' @export
-sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", md.min = 0.05, svQTL.removal = FALSE, FDR.svQTL = 0.05){
-  
-  pv <- md <- NULL ## Uglily suppress R checks for ggplot2
-  traceBack <- function(nominals.gene, permuted.df, p_t){
-    permuted.gene <- subset(permuted.df, geneId == nominals.gene$geneId[1])
-    p_tn <- qbeta(p = p_t, shape1 = permuted.gene$shape1, shape2 = permuted.gene$shape2)
-    permuted.gene$p_tn <- p_tn
-    return(merge(permuted.gene, subset(nominals.gene, pv <= p_tn)))
-  }
-  if (any(colnames(res.nominal.df) == "pv.svQTL") & svQTL.removal) {
-    if (method == "BH"){
-      res.nominal.df$fdr.svQTL <- stats::p.adjust(res.nominal.df$pv.svQTL, method = "BH")
-    }else if (method == "qvalue"){
-      res.nominal.df$fdr.svQTL <- qvalue::qvalue(res.nominal.df$pv.svQTL)$qvalues
-    }else{
-      stop("Available methods for FDR are 'BH' and 'qvalue'.")
+sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH", 
+                    md.min = 0.05, svQTL.removal = FALSE, FDR.svQTL = 0.05)
+{
+    pv <- md <- NULL ## Uglily suppress R checks for ggplot2
+    traceBack <- function(nominals.gene, permuted.df, p_t){
+        permuted.gene <- subset(permuted.df, geneId == nominals.gene$geneId[1])
+        p_tn <- qbeta(p = p_t, shape1 = permuted.gene$shape1, shape2 = permuted.gene$shape2)
+        permuted.gene$p_tn <- p_tn
+        return(merge(permuted.gene, subset(nominals.gene, pv <= p_tn)))
     }
-  }
-  if (method == "BH"){
-    res.permuted.df$fdr <- stats::p.adjust(res.permuted.df$pv.emp.beta, method = "BH")
-  }else if (method == "qvalue"){
-    res.permuted.df$fdr <- qvalue::qvalue(res.permuted.df$pv.emp.beta)$qvalues
-  }else{
-    stop("Available methods for FDR are 'BH' and 'qvalue'.")
-  }
-  
-  set0 <- subset(res.permuted.df, fdr <= FDR)
-  set1 <- subset(res.permuted.df, fdr > FDR)
-  p_t <- (sort(set1$pv.emp.beta)[1] - sort(-1.0 * set0$pv.emp.beta)[1]) / 2
-  fdr_pt <- (sort(set1$fdr)[1] - sort(-1.0 * set0$fdr)[1]) / 2
-  
-  res.permuted.df <- set0
-  res.nominal.df <- subset(res.nominal.df, geneId %in% res.permuted.df$geneId)
-  
-  err <- abs(fdr_pt - FDR)
-  if (err > 0.5 * FDR){
-    stop(paste0(sprintf("|closest observed FDR - FDR threshold set at %0.3f| > %0.3f.\n", FDR, 0.5 * FDR),
-                "   Empirical P-value threshold cannot be estimated. Use sqtls function in this package instead."))
-  } else if (err > 0.2 * FDR) {
-      warning(sprintf("|closest observed FDR - FDR threshold set at %0.3f| > %0.3f.", FDR, 0.2 * FDR))
-  } else {
-      message(sprintf("|closest observed FDR - FDR threshold set at %0.3f| = %0.2e.", FDR, err))
-  }
-  message(sprintf("Global empirical P-value threshold = %0.2e", p_t))
-  
-  res.df <- as.data.frame(dplyr::do(dplyr::group_by(res.nominal.df, geneId), traceBack(., res.permuted.df, p_t)))
-  
-  if (svQTL.removal){
-    res.df <- subset(res.df, fdr.svQTL > FDR.svQTL & md >= md.min)
-  }else{
-    res.df <- subset(res.df, md >= md.min)
-  }
-  return(res.df)
+    if (any(colnames(res.nominal.df) == "pv.svQTL") & svQTL.removal) {
+        if (method == "BH"){
+            res.nominal.df$fdr.svQTL <- stats::p.adjust(res.nominal.df$pv.svQTL, method = "BH")
+        } else if (method == "qvalue"){
+            res.nominal.df$fdr.svQTL <- qvalue::qvalue(res.nominal.df$pv.svQTL)$qvalues
+        } else{
+            stop("Available methods for FDR are 'BH' and 'qvalue'.")
+        }
+    }
+    if (method == "BH"){
+        res.permuted.df$fdr <- stats::p.adjust(res.permuted.df$pv.emp.beta, method = "BH")
+    } else if (method == "qvalue"){
+        res.permuted.df$fdr <- qvalue::qvalue(res.permuted.df$pv.emp.beta)$qvalues
+    } else{
+        stop("Available methods for FDR are 'BH' and 'qvalue'.")
+    }
+    set0 <- subset(res.permuted.df, fdr <= FDR)
+    set1 <- subset(res.permuted.df, fdr > FDR)
+    p_t <- (sort(set1$pv.emp.beta)[1] - sort(-1.0 * set0$pv.emp.beta)[1]) / 2
+    fdr_pt <- (sort(set1$fdr)[1] - sort(-1.0 * set0$fdr)[1]) / 2
+    res.permuted.df <- set0
+    res.nominal.df <- subset(res.nominal.df, geneId %in% res.permuted.df$geneId)
+    err <- abs(fdr_pt - FDR)
+    if (err > 0.5 * FDR){
+        stop(paste0(sprintf("|closest observed FDR - FDR threshold set at %0.3f| > %0.3f.\n", FDR, 0.5 * FDR),
+                    "   Empirical P-value threshold cannot be estimated. Use sqtls function in this package instead."))
+    } else if (err > 0.2 * FDR) {
+        warning(sprintf("|closest observed FDR - FDR threshold set at %0.3f| > %0.3f.", FDR, 0.2 * FDR))
+    } else {
+        message(sprintf("|closest observed FDR - FDR threshold set at %0.3f| = %0.2e.", FDR, err))
+    }
+    message(sprintf("Global empirical P-value threshold = %0.2e", p_t))
+    res.df <- as.data.frame(dplyr::do(dplyr::group_by(res.nominal.df, geneId), 
+                                      traceBack(., res.permuted.df, p_t)))
+    if (svQTL.removal){
+        res.df <- subset(res.df, fdr.svQTL > FDR.svQTL & md >= md.min)
+    } else{
+        res.df <- subset(res.df, md >= md.min)
+    }
+    return(res.df)
 }

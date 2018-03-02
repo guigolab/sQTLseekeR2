@@ -4,27 +4,29 @@
 \alias{compute.empirical.pv}
 \title{Compute empirical P-value}
 \usage{
-compute.empirical.pv(genotype.gene, tre.dist, best.snp, min.pv.obs,
-  min.nb.ext.scores = 100, nb.perm.max = 1000, comp.ld = TRUE,
-  verbose = FALSE)
+compute.empirical.pv(genotype.gene, tre.mt, best.snp, min.pv.obs,
+  nb.perm.min = 100, nb.perm.max = 1000, min.nb.ext.scores = 100,
+  comp.ld = TRUE, verbose = FALSE)
 }
 \arguments{
 \item{genotype.gene}{a data.frame of genotypes produced by \code{\link{read.bedix}}.}
 
-\item{tre.dist}{a interdistance matrix produced by \code{\link{hellingerDist}}.}
+\item{tre.mt}{a matrix of splicing ratios (samples x transcripts).}
 
 \item{best.snp}{SNP with the smallest observed nominal P-value, computed by \code{\link{compute.nominal.pv}}.}
 
 \item{min.pv.obs}{smallest observed nominal P-value.}
 
-\item{min.nb.ext.scores}{the minimum number of permuted  nominal P-values lower than
-the smallest observed nominal P-value to allow the computation to stop. Default is 100.}
+\item{nb.perm.min}{the minimum number of permutations. Default is 100.}
 
 \item{nb.perm.max}{the maximum number of permutations. Default is 1000.}
 
-\item{comp.ld}{should linkage disequilibrium estimates be computed (median R2). Default is TRUE.}
+\item{min.nb.ext.scores}{the minimum number of permuted  nominal P-values lower than
+the smallest observed nominal P-value to allow the computation to stop. Default is 100.}
 
-\item{verbose}{Default is TRUE. Mainly for debugging.}
+\item{comp.ld}{should linkage disequilibrium estimates be computed (median r2). Default is \code{TRUE}.}
+
+\item{verbose}{Default is \code{FALSE}.}
 }
 \value{
 a data.frame with columns:
@@ -37,7 +39,7 @@ a data.frame with columns:
 \item{nb.perms}{the number of permutations used for the empirical P-value computation.}
 \item{pv.emp}{empirical P-value based on permutations.}
 \item{pv.emp.beta}{empirical P-value based on the beta approximation.}
-\item{runtime}{approximated computation time per gene.}
+\item{runtime}{approximated computation time per gene (mins).}
 }
 \description{
 Computes empirical P-value for a gene.
