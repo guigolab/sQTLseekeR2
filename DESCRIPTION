@@ -1,8 +1,8 @@
 Package: sQTLseekeR2
 Type: Package
 Title: Splicing QTL discovery tool
-Version: 0.2.2
-Date: 2018-03-02
+Version: 1.0.0
+Date: 2019-05-09
 Author: Diego Garrido-Martín, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigo.
 Maintainer: Diego Garrido-Martín <diego.garrido@crg.eu>
 Description: sQTLseekeR2 package
