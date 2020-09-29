@@ -43,5 +43,5 @@ For additional information on the analysis steps you can have a look at [sQTLsee
 
 ## Running sQTLseekeR2 on computing clusters
 
-`sQTLseekeR2` can be easily used on a cluster thanks to [Nextflow](https://www.nextflow.io). See [sqtlseeker2-nf](https://github.com/dgarrimar/sqtlseeker2-nf) for details.
+`sQTLseekeR2` can be easily used on a cluster thanks to [Nextflow](https://www.nextflow.io). See [sqtlseeker2-nf](https://github.com/guigolab/sqtlseeker2-nf) for details.
 
