@@ -4,8 +4,12 @@
 \alias{permutest.betadisper}
 \title{Betadisper permutation hack}
 \usage{
-permutest.betadisper(x, pairwise = FALSE, control = permute::how(nperm =
-  999), ...)
+permutest.betadisper(
+  x,
+  pairwise = FALSE,
+  control = permute::how(nperm = 999),
+  ...
+)
 }
 \arguments{
 \item{x}{an object of class 'betadisper' the result of a call to 'betadisper'.}

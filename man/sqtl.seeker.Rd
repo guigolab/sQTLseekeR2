@@ -4,10 +4,22 @@
 \alias{sqtl.seeker}
 \title{sQTL seeker}
 \usage{
-sqtl.seeker(tre.df, genotype.f, gene.loc, covariates = NULL,
-  genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  nb.perm.max.svQTL = 10000, svQTL = FALSE, asympt = TRUE,
-  ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
+sqtl.seeker(
+  tre.df,
+  genotype.f,
+  gene.loc,
+  covariates = NULL,
+  int = NULL,
+  genic.window = 5000,
+  min.nb.ext.scores = 1000,
+  nb.perm.max = 1e+06,
+  nb.perm.max.svQTL = 10000,
+  svQTL = FALSE,
+  asympt = TRUE,
+  ld.filter = NULL,
+  min.nb.ind.geno = 10,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -24,6 +36,10 @@ Must have column 'snpId'.}
 Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
 
+\item{int}{name of an additional 2-level categorical covariate to be tested (a model 
+of main effects 'genotype' and 'int', plus interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
+If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'int' is not \code{NULL}.}
+
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 
 \item{min.nb.ext.scores}{the minimum number of permuted score higher than
@@ -38,7 +54,7 @@ computation of svQTLs cannot rely on asymptotic approximation, hence the heavy p
 considerably increase the running time.}
 
 \item{asympt}{should the asymptotic null distribution be used to assess significance instead of permutations. 
-The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
+The \code{\link[CompQuadForm]{farebrother}} method in the \code{CompQuadForm} package is employed to compute P-values.
 Default is \code{TRUE}.}
 
 \item{ld.filter}{Linkage disequilibrium threshold (r2) over which variants should be merged,
@@ -65,7 +81,7 @@ a data.frame with columns
 \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 }
 \description{
-\code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
+\code{sqtl.seeker} is the main function of \code{sQTLseekeR_int} package. From transcript relative expression,
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
 file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
@@ -90,7 +106,7 @@ The permutation process is optimized by computing one permuted distribution per 
 of permutations dependant on how extreme are the observed scores when compared to the permuted ones. To decrease
 even more the computation time, an approximation of the null F distribution was given by Anderson &
 Robinson (2003), as a misture of Chi-square distributions whose parameters are derived from the eigen
-values of the distance matrix.
+values of the distance matrix. 
 
 In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2

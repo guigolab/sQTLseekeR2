@@ -1,11 +1,11 @@
-Package: sQTLseekeR2
+Package: sQTLseekeR2.int
 Type: Package
-Title: Splicing QTL discovery tool
+Title: Splicing QTL discovery tool (interaction test)
 Version: 1.0.0
-Date: 2019-05-09
-Author: Diego Garrido-Martín, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigo.
+Date: 2020-05-29
+Author: Diego Garrido-Martín, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigó.
 Maintainer: Diego Garrido-Martín <diego.garrido@crg.eu>
-Description: sQTLseekeR2 package
+Description: sQTLseekeR2.int package
 License: GPL-3
 Encoding: UTF-8
 Imports:
@@ -24,4 +24,4 @@ Imports:
     fitdistrplus,
     car
 biocViews:
-RoxygenNote: 6.0.1
+RoxygenNote: 7.1.1

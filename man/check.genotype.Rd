@@ -4,13 +4,19 @@
 \alias{check.genotype}
 \title{Check genotype}
 \usage{
-check.genotype(geno.df, tre.df, min.nb.ind.geno = 10)
+check.genotype(geno.df, tre.df, min.nb.ind.geno = 10, int = NULL)
 }
 \arguments{
 \item{geno.df}{a data.frame of genotypes produced by \code{\link{read.bedix}}.}
 
 \item{tre.df}{a data.frame with transcript relative expression values
 produced by \code{\link{prepare.trans.exp}} corresponding to one gene.}
+
+\item{min.nb.ind.geno}{minimum number of individuals per genotype group if
+'int' is \code{NULL}. Otherwise, minimum number of individuals per
+interaction level.}
+
+\item{int}{a 1-column data.frame with the int factor.}
 }
 \value{
 A character vector of SNP suitabilities. Possible labels:

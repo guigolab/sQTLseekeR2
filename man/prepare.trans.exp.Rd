@@ -4,8 +4,14 @@
 \alias{prepare.trans.exp}
 \title{Transcript expression preparation}
 \usage{
-prepare.trans.exp(te.df, min.transcript.exp = 0.01, min.gene.exp = 0.01,
-  min.prop = 0.8, min.dispersion = 0.1, verbose = FALSE)
+prepare.trans.exp(
+  te.df,
+  min.transcript.exp = 0.01,
+  min.gene.exp = 0.01,
+  min.prop = 0.8,
+  min.dispersion = 0.1,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{te.df}{a data.frame with the transcript expression. The first

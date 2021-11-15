@@ -4,8 +4,14 @@
 \alias{LD.filter}
 \title{Linkage disequilibrium (LD) filter}
 \usage{
-LD.filter(genotype.gene, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25,
-  svQTL = FALSE)
+LD.filter(
+  genotype.gene,
+  tre.mt,
+  th = 1,
+  tol = 0.05,
+  tol.svqtl = 0.25,
+  svQTL = FALSE
+)
 }
 \arguments{
 \item{genotype.gene}{a data.frame with genotype info produced by 'read.bedix'.}

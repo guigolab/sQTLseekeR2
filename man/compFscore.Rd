@@ -4,7 +4,14 @@
 \alias{compFscore}
 \title{F score computation}
 \usage{
-compFscore(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE)
+compFscore(
+  geno.df,
+  tre.mt,
+  svQTL = FALSE,
+  asympt = TRUE,
+  res = FALSE,
+  int = NULL
+)
 }
 \arguments{
 \item{geno.df}{a data.frame of one row with the genotype information for each sample.}
@@ -14,10 +21,13 @@ compFscore(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE)
 \item{svQTL}{should svQTL test be performed in addition to sQTL. Default is \code{FALSE}.}
 
 \item{asympt}{should significance for the F score (sQTL test) be computed using 
-the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
+the \code{\link[CompQuadForm]{farebrother}} method in the \code{CompQuadForm} package. 
 Default is \code{TRUE}.}
 
 \item{res}{is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}}
+
+\item{int}{covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
+Default is \code{NULL}. This will enable the asymptotic mode. Ignored if \code{res} is \code{FALSE}.}
 }
 \value{
 A data.frame with columns:

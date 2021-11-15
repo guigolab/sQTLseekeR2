@@ -5,9 +5,11 @@
 ##' @param tre.mt a matrix with the transcript relative expression (samples x transcripts). 
 ##' @param svQTL should svQTL test be performed in addition to sQTL. Default is \code{FALSE}.
 ##' @param asympt should significance for the F score (sQTL test) be computed using 
-##' the \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package. 
+##' the \code{\link[CompQuadForm]{farebrother}} method in the \code{CompQuadForm} package. 
 ##' Default is \code{TRUE}.
 ##' @param res is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}
+##' @param int covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
+##' Default is \code{NULL}. This will enable the asymptotic mode. Ignored if \code{res} is \code{FALSE}. 
 ##' @return A data.frame with columns:
 ##' \item{F}{the F score.}
 ##' \item{nb.groups}{the number of genotype groups.}
@@ -18,10 +20,15 @@
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
 ##' @import CompQuadForm
-compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE)
+compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE,
+                       int = NULL)
 {
     if(nrow(geno.df) > 1){
         stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
+    }
+    if(!is.null(int) && !res){
+        int <- NULL
+        warning("int will be set to NULL (res is FALSE)") # Double-check
     }
     geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
     names(geno.snp) <- rownames(tre.mt)
@@ -30,10 +37,18 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
     for (gt in c("-1", "0", "1", "2")){
         info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
     }
+    if (!is.null(int)){
+      int <- int[, 1]
+      names(int) <- rownames(tre.mt)
+      info.int <- paste(as.character(table(int)), collapse = ",")
+    }
     if (any(geno.snp == -1)) {
         non.na <- geno.snp > -1
         geno.snp <- geno.snp[non.na]
         tre.mt <- tre.mt[non.na, ]
+        if (!is.null(int)){
+          int <- int[non.na]
+        }
     }
     info.snp <- paste(info.snp, collapse =",")
     groups.snp.f <- factor(as.numeric(geno.snp))
@@ -43,64 +58,127 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
         tre.mt2md <- tre.mt^2 
     }   
     mdt <- md.trans(tre.mt2md, groups.snp.f)
-    n <- nrow(tre.mt)
-    nb.gp <- nlevels(groups.snp.f)
-    dfnum <- nb.gp - 1
-    dfden <- n - dfnum - 1
-    tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
-    G <- tcrossprod(tre.mt)
-    X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f),
-                             contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
-    H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
-    numer <- crossprod(c(H), c(G))
-    trG <- sum(diag(G))
-    denom <- trG - numer
-    f.tilde <- as.numeric(numer/denom)  
-    if (asympt) {
+ 
+    if (is.null(int)){
+      n <- nrow(tre.mt)
+      nb.gp <- nlevels(groups.snp.f)
+      dfnum <- nb.gp - 1
+      dfden <- n - dfnum - 1
+      tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
+      G <- tcrossprod(tre.mt)
+      X <- stats::model.matrix(~., data = data.frame(genotype = groups.snp.f),
+                               contrasts.arg = list("genotype" = "contr.sum")) # Note contrast type    
+      H <- tcrossprod(tcrossprod(X, solve(crossprod(X))), X)
+      numer <- crossprod(c(H), c(G))
+      trG <- sum(diag(G))
+      denom <- trG - numer
+      f.tilde <- as.numeric(numer/denom)  
+      if (asympt) {
         fit <- lm(tre.mt ~ groups.snp.f)
         R <- fit$residuals
         e <- eigen(cov(R)*(n-1)/dfden, symmetric = TRUE, only.values = TRUE)$values
         lambda <- abs(e[abs(e) > 1e-12])
         item.acc <- 1e-14
-        pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, 
-                       df.e = dfden, acc = item.acc)
+        pv.snp <- pcqf(q = numer, lambda = lambda, df.i = dfnum, acc = item.acc)
         while (length(pv.snp) > 1) {
-            item.acc <- item.acc * 10
-            pv.snp <- pcqf(q = f.tilde, lambda = lambda, df.i = dfnum, 
-                           df.e = dfden, acc = item.acc)
+          item.acc <- item.acc * 10
+          if(item.acc < 1e-3){
+            stop("Accuracy requested below 1e-3")
+          }
+          pv.snp <- pcqf(q = numer, lambda = lambda, df.i = dfnum, acc = item.acc)
         }
         if (pv.snp < item.acc) pv.snp <- item.acc
         res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp,
                              md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second,
                              info = info.snp, pv = pv.snp, stringsAsFactors = FALSE)
-    } else {
+      } else {
         res.df <- data.frame(F = f.tilde*dfden/dfnum, nb.groups = nb.gp, 
-                         md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second, 
-                         info = info.snp, stringsAsFactors = FALSE)
-    }
-    if (svQTL) {
+                             md = mdt$md, tr.first = mdt$tr.first, tr.second = mdt$tr.second, 
+                             info = info.snp, stringsAsFactors = FALSE)
+      }
+      if (svQTL) {
         bd <- vegan::betadisper(dist(tre.mt), groups.snp.f, type = "centroid")
         bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
         res.df$F.svQTL <- bd.perm$F
+      }
+    } else {
+        info.interaction <- paste(as.character(table(groups.snp.f:int)), collapse = ",")
+        ls <- names(table(int))
+        mdt_l1 <- md.trans(tre.mt2md[int == ls[1], ],
+                           groups.snp.f[int == ls[1]])
+        mdt_l2 <- md.trans(tre.mt2md[int == ls[2], ],
+                           groups.snp.f[int == ls[2]])
+        tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
+        fit <- lm(tre.mt ~ groups.snp.f + int + groups.snp.f:int,
+                  contrasts = list(groups.snp.f = "contr.sum", int = "contr.sum"))
+        R <- fit$residuals
+        n <- nrow(R)
+        UU <- car::Anova(fit, type = "II") 
+        SS <- lapply(UU$SSP, function(x){sum(diag(x))})
+        SSe <- sum(diag(UU$SSPE))
+        f.tilde <- unlist(lapply(SS, function(x){x/SSe}))
+        Df <- UU$df
+        df.e <- fit$df.residual
+        e <- eigen(cov(R)*(n-1)/df.e, symmetric = T, only.values = T)$values
+        e <- abs(e[abs(e) > 1e-12])
+        item.acc <- 1e-14
+        pvs <- mapply(pv.ss, ss = unlist(SS), df.i = Df, MoreArgs = list(lambda = e))
+        Fs <- f.tilde*df.e/Df
+        res.df <- data.frame(F_snp = Fs[1], F_int = Fs[2], F_snpXint = Fs[3],
+                             pv_snp = pvs[1], pv_int = pvs[2], pv_snpXint = pvs[3], 
+                             nb.groups = nlevels(groups.snp.f), md_snp = mdt$md, 
+                             tr.first_snp = mdt$tr.first, tr.second_snp = mdt$tr.second,
+                             md_int_l1 = mdt_l1[[1]], md_int_l2 = mdt_l2[[1]], 
+                             tr.agree = sum(unlist(mdt_l1[2:3])%in%unlist(mdt_l2[2:3])),                                                                   
+                             info_snp = info.snp, info_int = info.int, 
+                             info_snpXint = info.interaction, stringsAsFactors = FALSE) 
+        if (svQTL) {
+          bd <- vegan::betadisper(dist(tre.mt), groups.snp.f:int, type = "centroid")
+          bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
+          res.df$F.svQTL <- bd.perm$F
+        }
     }
+
     if (any(colnames(geno.df) == "LD")) {
         res.df$LD <- geno.df$LD
     }
     return(res.df)
 }
 
-pcqf <- function (q, lambda, df.i, df.e, lim = 50000, acc = 1e-14)
+pv.ss <- function(ss, lambda, df.i, acc = 1e-14, max.acc = 1e-8 , tol = 1e-3)
 {
-    gamma <- c(lambda, -q * lambda)
-    nu <- c(rep(df.i, length(lambda)), rep(df.e, length(lambda)))
-    pv <- suppressWarnings(CompQuadForm::davies(0, lambda = gamma, h = nu, lim = lim, acc = acc))
-    if (pv$ifault != 0) {
+  start.acc <- acc
+  lambda <- lambda[lambda/sum(lambda) > tol]
+  pv <- pcqf(q = ss, lambda = lambda, df.i = df.i, acc = acc)
+  while (length(pv) > 1) {
+    acc <- acc * 10
+    if(acc > max.acc){
+      stop("Accuracy requested in CompQuadForm::farebrother above 1e-8.")
+    }
+    pv  <- pcqf(q = ss, lambda = lambda, df.i = df.i, acc = acc)
+  }
+  if (pv < start.acc) {
+    pv <- start.acc
+  }
+  return(pv)
+}
+
+pcqf <- function (q, lambda, df.i, acc = 1e-14, min.time = 10)
+{
+    t0 <- Sys.time()
+    pv <- CompQuadForm::farebrother(q, lambda = lambda, h = rep(df.i, length(lambda)), eps = acc) # Add suppressWarnings ?
+    t1 <- Sys.time()
+    time <- as.numeric(difftime(t1, t0, units = "secs"))
+    if(time > min.time) {warning(sprintf("CompQuadForm::farebrother runs too slow: %.2f secs.", time))}
+    
+    if (pv$Qq < 0 || pv$Qq > 1) { # This is equivalent to ifaults 5 and 9. Can be solved reducing acc
+        warning(sprintf("CompQuadForm::farebrother Qq is %s.", pv$Qq))
         return(pv)
     }
-    if (pv$Qq < 0 || pv$Qq > 1) {
-        return(pv)
+    if (! pv$ifault %in% c(0,4)) {
+      stop(sprintf("CompQuadForm::farebrother ifault is %s.", pv$ifault))
     }
-    if (pv$ifault == 0) {
+    if (pv$ifault %in% c(0, 4)) {
         return(pv$Qq)
     }
 }

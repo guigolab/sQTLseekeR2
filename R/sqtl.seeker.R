@@ -1,4 +1,4 @@
-##' \code{sqtl.seeker} is the main function of \code{sQTLseekeR2} package. From transcript relative expression,
+##' \code{sqtl.seeker} is the main function of \code{sQTLseekeR2.int} package. From transcript relative expression,
 ##' prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
 ##' file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 ##' expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
@@ -38,6 +38,9 @@
 ##' @param covariates a data.frame with covariate information per sample (samples x covariates).
 ##' Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 ##' When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.
+##' @param int name of an additional 2-level categorical covariate to be tested (a model 
+##' of main effects 'genotype' and 'int', plus interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
+##' If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'int' is not \code{NULL}.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
 ##' the highest true score to allow the computation to stop. Default is 1000.
@@ -47,7 +50,7 @@
 ##' computation of svQTLs cannot rely on asymptotic approximation, hence the heavy permutations will
 ##' considerably increase the running time.
 ##' @param asympt should the asymptotic null distribution be used to assess significance instead of permutations. 
-##' The \code{\link[CompQuadForm]{davies}} method in the \code{CompQuadForm} package is employed to compute P-values.
+##' The \code{\link[CompQuadForm]{farebrother}} method in the \code{CompQuadForm} package is employed to compute P-values.
 ##' Default is \code{TRUE}.
 ##' @param ld.filter Linkage disequilibrium threshold (r2) over which variants should be merged,
 ##' so that only one SNP per LD block is tested. Only variants over the treshold that have highly similar 
@@ -71,6 +74,7 @@
 ##' @export
 ##' @import car
 sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
+                        int = NULL,
                         genic.window = 5000, min.nb.ext.scores = 1000, 
                         nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, 
                         svQTL = FALSE, asympt = TRUE, ld.filter = NULL, 
@@ -100,8 +104,12 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                                     sum(cov.na)))     
                 }
                 if(sum(cov.na) / nrow(covariates) > 0.05){
-                    stop("More than 5% of the samples contain NA values for at least one covariate")  
+                    stop("More than 5% of the samples contain NA values for at least one covariate.")  
                 }
+            } else {
+              if(!is.null(int)){
+                stop("covariates should be not NULL when int is not NULL.")
+              }
             }
             tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
             genotype.headers <- as.character(utils::read.table(genotype.f,
@@ -132,9 +140,18 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                 covariates <- covariates[com.samples, , drop = FALSE]
                 multiclass <- apply(covariates, 2, function(x){length(table(x)) > 1})
                 covariates <- covariates[, multiclass, drop = FALSE]
-                if (verbose){
+                if (verbose & any(!multiclass)){
                   message("\t", "Covariates removed due to only one value: ", 
                           paste(names(multiclass)[!multiclass], collapse = ", "))
+                }
+                if (!is.null(int)){
+                    asympt <- TRUE
+                    int_tmp <- covariates[, colnames(covariates)%in%int, drop = F]
+                    covariates <- covariates[, !colnames(covariates)%in%int]
+                    int <- int_tmp
+                    if (all(class(int[, 1]) != "factor")){
+                      stop("\t", "int variable should be categorical.")
+                    }
                 }
                 fit <- lm(tre.tc ~ ., data = covariates)
                 if (ncol(covariates) > 1){
@@ -170,7 +187,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                 if(!is.null(genotype.gene)){
                     snps.to.keep <- check.genotype(genotype.gene[, com.samples], 
                                                    tre.gene[, com.samples], 
-                                                   min.nb.ind.geno = min.nb.ind.geno)
+                                                   min.nb.ind.geno = min.nb.ind.geno,
+                                                   int = int[, 1]) # int has com.samples already
                     if(verbose){
                         snps.to.keep.t <- table(snps.to.keep)
                         message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, 
@@ -187,7 +205,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                         res.range <- dplyr::do(dplyr::group_by(genotype.gene, snpId),
                                                compFscore(., tre.tc, svQTL = svQTL, 
                                                           asympt = asympt, 
-                                                          res = !is.null(covariates)))
+                                                          res = !is.null(covariates),
+                                                          int = int))
                     }
                 }
                 return(res.range)
@@ -206,15 +225,26 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                                                    nb.perm.max = nb.perm.max)) 
                 }
                 if(svQTL){
+                    if(!is.null(int)){
+                      res.df$nb.groups <- res.df$nb.groups*2
+                    }
                     res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups),
                                         compPvalue(., tre.tc, svQTL = TRUE,
                                                    min.nb.ext.scores = min.nb.ext.scores,
                                                    nb.perm.max = nb.perm.max.svQTL))
+                    if(!is.null(int)){
+                      res.df$nb.groups <- res.df$nb.groups/2
+                    }
                 }
                 if (!is.null(ld.filter)){
                     res.df <- merge(res.df, ld, by = "snpId")
                 }
-                res.df <- dplyr::arrange(res.df, pv)
+                if ("pv" %in% colnames(res.df)){
+                    res.df <- dplyr::arrange(res.df, pv)
+                }else if ("pv_snpXint" %in% colnames(res.df)){
+                    res.df <- dplyr::arrange(res.df, pv_snpXint)
+                }
+                
                 return(data.frame(done = TRUE, res.df))
             }
         } else {
@@ -242,6 +272,10 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
 ##' @param geno.df a data.frame of genotypes produced by \code{\link{read.bedix}}.
 ##' @param tre.df a data.frame with transcript relative expression values
 ##' produced by \code{\link{prepare.trans.exp}} corresponding to one gene.
+##' @param min.nb.ind.geno minimum number of individuals per genotype group if
+##' 'int' is \code{NULL}. Otherwise, minimum number of individuals per
+##' interaction level.
+##' @param int a 1-column data.frame with the int factor.
 ##' @return A character vector of SNP suitabilities. Possible labels:
 ##' \item{"Missing genotype" (more than 3 missing genotype values)}{ }
 ##' \item{"Only one genotype group"}{ }
@@ -250,7 +284,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
 ##' \item{"PASS"}{ }
 ##' @author Jean Monlong, Diego Garrido-Martín 
 ##' @keywords internal
-check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10)
+check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10, int = NULL)
 {
     apply(geno.df, 1, function(geno.snp){
         if(sum(as.numeric(geno.snp) == -1) > 2){
@@ -260,14 +294,30 @@ check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10)
         if (length(geno.snp.t) < 2) {
             return("Only one genotype group")                    
         }
-        if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
+        if(!is.null(int)){
+          int <- int[geno.snp > -1]
+          geno.snp <- geno.snp[geno.snp > -1]
+          geno.snp.f <- as.factor(geno.snp)
+          interaction.t <- table(geno.snp.f:int)
+          if (sum(interaction.t >= min.nb.ind.geno) < length(interaction.t)) {
             return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
-        }
-        nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
-            nbDiffPt(tre.df[, which(geno.snp == geno.i)])
-        })
-        if(sum(nb.diff.pts >= 5) < length(geno.snp.t)){
+          }
+          nb.diff.pts <- sapply(names(interaction.t)[interaction.t > 1], function(geno.i){
+            nbDiffPt(tre.df[, which(geno.snp.f:int == geno.i)])
+          })
+          if(sum(nb.diff.pts >= 5) < length(interaction.t)){
             return("Not all the groups with >5 different splicing patterns")
+          }
+        } else {
+          if (sum(geno.snp.t >= min.nb.ind.geno) < length(geno.snp.t)) {
+              return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
+          }
+          nb.diff.pts <- sapply(names(geno.snp.t)[geno.snp.t > 1], function(geno.i){
+            nbDiffPt(tre.df[, which(geno.snp == geno.i)])
+          })
+          if(sum(nb.diff.pts >= 5) < length(geno.snp.t)){
+            return("Not all the groups with >5 different splicing patterns")
+          }
         }
         return("PASS")
     })
