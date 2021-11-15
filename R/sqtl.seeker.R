@@ -72,7 +72,6 @@
 ##' \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
-##' @import car
 sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
                         int = NULL,
                         genic.window = 5000, min.nb.ext.scores = 1000, 
@@ -153,9 +152,9 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                       stop("\t", "int variable should be categorical.")
                     }
                 }
-                fit <- lm(tre.tc ~ ., data = covariates)
+                fit <- stats::lm(tre.tc ~ ., data = covariates)
                 if (ncol(covariates) > 1){
-                    vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
+                    vifs <- car::vif(stats::lm(tre.tc[, 1] ~ ., data = covariates))
                     if (verbose){
                         message("\t", "Covariates VIF - ", 
                                 paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))

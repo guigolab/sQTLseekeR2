@@ -19,7 +19,6 @@
 ##' \item{pv}{if \code{asympt} is \code{TRUE} a P-value for the F score is computed.}
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
-##' @import CompQuadForm
 compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE,
                        int = NULL)
 {
@@ -74,9 +73,9 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
       denom <- trG - numer
       f.tilde <- as.numeric(numer/denom)  
       if (asympt) {
-        fit <- lm(tre.mt ~ groups.snp.f)
+        fit <- stats::lm(tre.mt ~ groups.snp.f)
         R <- fit$residuals
-        e <- eigen(cov(R)*(n-1)/dfden, symmetric = TRUE, only.values = TRUE)$values
+        e <- eigen(stats::cov(R)*(n-1)/dfden, symmetric = TRUE, only.values = TRUE)$values
         lambda <- abs(e[abs(e) > 1e-12])
         item.acc <- 1e-14
         pv.snp <- pcqf(q = numer, lambda = lambda, df.i = dfnum, acc = item.acc)
@@ -97,7 +96,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
                              info = info.snp, stringsAsFactors = FALSE)
       }
       if (svQTL) {
-        bd <- vegan::betadisper(dist(tre.mt), groups.snp.f, type = "centroid")
+        bd <- vegan::betadisper(stats::dist(tre.mt), groups.snp.f, type = "centroid")
         bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
         res.df$F.svQTL <- bd.perm$F
       }
@@ -109,7 +108,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
         mdt_l2 <- md.trans(tre.mt2md[int == ls[2], ],
                            groups.snp.f[int == ls[2]])
         tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
-        fit <- lm(tre.mt ~ groups.snp.f + int + groups.snp.f:int,
+        fit <- stats::lm(tre.mt ~ groups.snp.f + int + groups.snp.f:int,
                   contrasts = list(groups.snp.f = "contr.sum", int = "contr.sum"))
         R <- fit$residuals
         n <- nrow(R)
@@ -119,7 +118,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
         f.tilde <- unlist(lapply(SS, function(x){x/SSe}))
         Df <- UU$df
         df.e <- fit$df.residual
-        e <- eigen(cov(R)*(n-1)/df.e, symmetric = T, only.values = T)$values
+        e <- eigen(stats::cov(R)*(n-1)/df.e, symmetric = T, only.values = T)$values
         e <- abs(e[abs(e) > 1e-12])
         item.acc <- 1e-14
         pvs <- mapply(pv.ss, ss = unlist(SS), df.i = Df, MoreArgs = list(lambda = e))
@@ -133,7 +132,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
                              info_snp = info.snp, info_int = info.int, 
                              info_snpXint = info.interaction, stringsAsFactors = FALSE) 
         if (svQTL) {
-          bd <- vegan::betadisper(dist(tre.mt), groups.snp.f:int, type = "centroid")
+          bd <- vegan::betadisper(stats::dist(tre.mt), groups.snp.f:int, type = "centroid")
           bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
           res.df$F.svQTL <- bd.perm$F
         }

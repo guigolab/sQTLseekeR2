@@ -81,7 +81,7 @@ a data.frame with columns
 \item{LD}{if ld.filter is not NULL, the variants in high LD (r2 >= ld.filter) with the tested variant that also have a similar Fscore.}
 }
 \description{
-\code{sqtl.seeker} is the main function of \code{sQTLseekeR_int} package. From transcript relative expression,
+\code{sqtl.seeker} is the main function of \code{sQTLseekeR2.int} package. From transcript relative expression,
 prepared using \code{prepare.trans.exp}, information about the gene location and the path to an ordered genotype
 file, indexed by the function \code{index.genotype}, association between each SNP and the transcript relative
 expression is tested. Eventually, svQTL, i.e. SNPs affecting splicing variability can also be tested to pinpoint
