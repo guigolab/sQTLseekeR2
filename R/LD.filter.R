@@ -76,7 +76,7 @@ computeLD <- function(M, ids, tre.mt, th = 1, tol = 0.05, tol.svqtl = 0.25)
     M <- as.matrix(M)
     if(ncol(M) > 1){
         s <- ncol(M)
-        R <- cor(M, use = "pairwise.complete.obs")
+        R <- stats::cor(M, use = "pairwise.complete.obs")
         R <- R^2
         blocks <- lapply(as.data.frame(R),function(x) which(x >= th))
         names(blocks) <- 1:s 
@@ -163,7 +163,7 @@ F.calc <- function(tre.mt, snp, svQTL = FALSE)
     }
     snp.f <- factor(snp)
     if(svQTL){
-        bd <- vegan::betadisper(dist(tre.mt), snp.f, type = "centroid")
+        bd <- vegan::betadisper(stats::dist(tre.mt), snp.f, type = "centroid")
         bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
         return(bd.perm$F)
     } else {

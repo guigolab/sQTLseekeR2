@@ -4,8 +4,14 @@
 \alias{compute.nominal.pv}
 \title{Compute nominal P-value}
 \usage{
-compute.nominal.pv(geno.df, tre.mt, permute = FALSE, seed = 1,
-  item.acc = 1e-14, eigen.tol = 1e-12)
+\method{compute}{nominal.pv}(
+  geno.df,
+  tre.mt,
+  permute = FALSE,
+  seed = 1,
+  item.acc = 1e-14,
+  eigen.tol = 1e-12
+)
 }
 \arguments{
 \item{geno.df}{a data.frame of one row with the genotype information for each sample.}

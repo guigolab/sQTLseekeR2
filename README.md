@@ -4,10 +4,11 @@
 
 ## Installation 
 
-From R, source the [install.R](install.R) file.
+From R:
 
 ```r
-source("install.R")
+install.packages("devtools")
+devtools::install_github("guigolab/sQTLseekeR2")
 ```
 
 **R 3.3 or higher** is required.

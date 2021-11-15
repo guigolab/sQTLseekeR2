@@ -35,8 +35,6 @@
 ##' \item{runtime}{approximated computation time per gene.}
 ##' @author Diego Garrido-Martín
 ##' @export
-##' @import fitdistrplus
-##' @import car
 sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
                           genic.window = 5000, nb.perm.min = 100, 
                           nb.perm.max = 1000, min.nb.ext.scores = 100, 
@@ -101,9 +99,9 @@ sqtl.seeker.p <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                   message("\t", "Covariates removed due to only one value: ", 
                           paste(names(multiclass)[!multiclass], collapse = ", "))
                 }
-                fit <- lm(tre.tc ~ ., data = covariates)
+                fit <- stats::lm(tre.tc ~ ., data = covariates)
                 if (ncol(covariates) > 1){
-                    vifs <- car::vif(lm(tre.tc[, 1] ~ ., data = covariates))
+                    vifs <- car::vif(stats::lm(tre.tc[, 1] ~ ., data = covariates))
                     if (verbose){
                         message("\t", "Covariates VIF - ", 
                                 paste(names(vifs), round(vifs, 2), sep = ": ", collapse = ", "))
@@ -197,7 +195,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
         perm <- sample(1:n)
         tre.mt <- tre.mt[perm, ]
     }
-    fit <- lm(tre.mt ~ groups.snp.f)
+    fit <- stats::lm(tre.mt ~ groups.snp.f)
     tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
     G <- tcrossprod(tre.mt)
     X <- stats::model.matrix(fit) # Note contrast type
@@ -209,7 +207,7 @@ compute.nominal.pv <- function(geno.df, tre.mt, permute = FALSE, seed = 1,
     R <- fit$residuals
     df.e <- fit$df.residual
     df.i <- nlevels(groups.snp.f) - 1
-    e <- eigen(cov(R)*(n-1)/df.e, symmetric = TRUE, only.values = TRUE)$values
+    e <- eigen(stats::cov(R)*(n-1)/df.e, symmetric = TRUE, only.values = TRUE)$values
     lambda <- abs(e[abs(e) > eigen.tol])
     pv.snp <- pcqf(q = f.tilde, lambda = lambda, 
                    df.i = df.i, df.e = df.e, acc = item.acc)
@@ -284,7 +282,7 @@ compute.empirical.pv <- function(genotype.gene, tre.mt, best.snp, min.pv.obs,
     shape1 <- fit$estimate[1]                                               
     shape2 <- fit$estimate[2]
     names(shape1) <- names(shape2) <- NULL
-    pv.beta <- pbeta(min.pv.obs, shape1 = shape1, shape2 = shape2)  
+    pv.beta <- stats::pbeta(min.pv.obs, shape1 = shape1, shape2 = shape2)  
     t1 <- Sys.time()
     t.run <- as.numeric(difftime(t1, t0, units = "mins"))
     res.df <- data.frame(variants.cis = variants.cis, LD = ld, best.snp = best.snp, 
@@ -304,8 +302,8 @@ compute.median.ld <- function(df)
     R <- matrix(NA, ncol = ns, nrow = ns)               
     for (i in 1:(ns - 1)){
         for (j in (1 + i):ns){
-            R[i, j] <- cor(M[i, ], M[j, ])^2
+            R[i, j] <- stats::cor(M[i, ], M[j, ])^2
         }
     }
-    return(median(R, na.rm = TRUE)) 
+    return(stats::median(R, na.rm = TRUE)) 
 }

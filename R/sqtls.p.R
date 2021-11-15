@@ -35,7 +35,7 @@ sqtls.p <- function(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH",
     pv <- md <- NULL ## Uglily suppress R checks for ggplot2
     traceBack <- function(nominals.gene, permuted.df, p_t){
         permuted.gene <- subset(permuted.df, geneId == nominals.gene$geneId[1])
-        p_tn <- qbeta(p = p_t, shape1 = permuted.gene$shape1, shape2 = permuted.gene$shape2)
+        p_tn <- stats::qbeta(p = p_t, shape1 = permuted.gene$shape1, shape2 = permuted.gene$shape2)
         permuted.gene$p_tn <- p_tn
         return(merge(permuted.gene, subset(nominals.gene, pv <= p_tn)))
     }

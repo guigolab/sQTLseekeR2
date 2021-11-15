@@ -4,8 +4,15 @@
 \alias{sqtls.p}
 \title{sQTL retrieval from permuted phenotypes}
 \usage{
-sqtls.p(res.nominal.df, res.permuted.df, FDR = 0.05, method = "BH",
-  md.min = 0.05, svQTL.removal = FALSE, FDR.svQTL = 0.05)
+sqtls.p(
+  res.nominal.df,
+  res.permuted.df,
+  FDR = 0.05,
+  method = "BH",
+  md.min = 0.05,
+  svQTL.removal = FALSE,
+  FDR.svQTL = 0.05
+)
 }
 \arguments{
 \item{res.nominal.df}{a data.frame, output of 'sqtl.seeker' with the nominal P-values

@@ -4,9 +4,18 @@
 \alias{sqtl.seeker.p}
 \title{permuted sQTL seeker}
 \usage{
-sqtl.seeker.p(tre.df, genotype.f, gene.loc, covariates = NULL,
-  genic.window = 5000, nb.perm.min = 100, nb.perm.max = 1000,
-  min.nb.ext.scores = 100, min.nb.ind.geno = 10, verbose = FALSE)
+sqtl.seeker.p(
+  tre.df,
+  genotype.f,
+  gene.loc,
+  covariates = NULL,
+  genic.window = 5000,
+  nb.perm.min = 100,
+  nb.perm.max = 1000,
+  min.nb.ext.scores = 100,
+  min.nb.ind.geno = 10,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression

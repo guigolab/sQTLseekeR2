@@ -4,8 +4,13 @@
 \alias{compPvalue}
 \title{P-values computation.}
 \usage{
-compPvalue(res.df, tre.mt, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  svQTL = FALSE)
+compPvalue(
+  res.df,
+  tre.mt,
+  min.nb.ext.scores = 1000,
+  nb.perm.max = 1e+06,
+  svQTL = FALSE
+)
 }
 \arguments{
 \item{res.df}{a data.frame with the F scores and number of groups.}

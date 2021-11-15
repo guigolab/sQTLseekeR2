@@ -74,11 +74,11 @@ vegan.null <- function(tre, permutations, nb.gp, svQTL = FALSE)
 {
     groups.f <- factor(sample(1:nb.gp, nrow(tre), replace = TRUE))
     if(svQTL){
-        bd <- vegan::betadisper(dist(tre), groups.f, type = "centroid")
+        bd <- vegan::betadisper(stats::dist(tre), groups.f, type = "centroid")
         bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = permutations)) 
         return(bd.perm$f.perms)
     } else {
-        res <- vegan::adonis(dist(tre) ~ groups.f, permutations = permutations)
+        res <- vegan::adonis(stats::dist(tre) ~ groups.f, permutations = permutations)
         return(as.numeric(res$f.perms[, 1]))
     }
 }

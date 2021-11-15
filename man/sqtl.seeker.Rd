@@ -4,10 +4,21 @@
 \alias{sqtl.seeker}
 \title{sQTL seeker}
 \usage{
-sqtl.seeker(tre.df, genotype.f, gene.loc, covariates = NULL,
-  genic.window = 5000, min.nb.ext.scores = 1000, nb.perm.max = 1e+06,
-  nb.perm.max.svQTL = 10000, svQTL = FALSE, asympt = TRUE,
-  ld.filter = NULL, min.nb.ind.geno = 10, verbose = FALSE)
+sqtl.seeker(
+  tre.df,
+  genotype.f,
+  gene.loc,
+  covariates = NULL,
+  genic.window = 5000,
+  min.nb.ext.scores = 1000,
+  nb.perm.max = 1e+06,
+  nb.perm.max.svQTL = 10000,
+  svQTL = FALSE,
+  asympt = TRUE,
+  ld.filter = NULL,
+  min.nb.ind.geno = 10,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{tre.df}{a data.frame with transcript relative expression
@@ -90,7 +101,7 @@ The permutation process is optimized by computing one permuted distribution per 
 of permutations dependant on how extreme are the observed scores when compared to the permuted ones. To decrease
 even more the computation time, an approximation of the null F distribution was given by Anderson &
 Robinson (2003), as a misture of Chi-square distributions whose parameters are derived from the eigen
-values of the distance matrix.
+values of the distance matrix. 
 
 In addition to the F score and P-value, the maximum difference(MD) in relative expression between genotype
 groups is reported. This is to be used as a measure of the size of the effect. For example, if 'md' is 0.2

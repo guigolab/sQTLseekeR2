@@ -4,9 +4,17 @@
 \alias{compute.empirical.pv}
 \title{Compute empirical P-value}
 \usage{
-compute.empirical.pv(genotype.gene, tre.mt, best.snp, min.pv.obs,
-  nb.perm.min = 100, nb.perm.max = 1000, min.nb.ext.scores = 100,
-  comp.ld = TRUE, verbose = FALSE)
+\method{compute}{empirical.pv}(
+  genotype.gene,
+  tre.mt,
+  best.snp,
+  min.pv.obs,
+  nb.perm.min = 100,
+  nb.perm.max = 1000,
+  min.nb.ext.scores = 100,
+  comp.ld = TRUE,
+  verbose = FALSE
+)
 }
 \arguments{
 \item{genotype.gene}{a data.frame of genotypes produced by \code{\link{read.bedix}}.}

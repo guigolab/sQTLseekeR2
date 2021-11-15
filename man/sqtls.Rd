@@ -4,8 +4,15 @@
 \alias{sqtls}
 \title{sQTL retrieval}
 \usage{
-sqtls(res.df, FDR = 0.05, method = "BH", md.min = 0.05, out.pdf = NULL,
-  svQTL.removal = TRUE, FDR.svQTL = 0.05)
+sqtls(
+  res.df,
+  FDR = 0.05,
+  method = "BH",
+  md.min = 0.05,
+  out.pdf = NULL,
+  svQTL.removal = TRUE,
+  FDR.svQTL = 0.05
+)
 }
 \arguments{
 \item{res.df}{a data.frame, output of 'sqtl.seeker' with the P-values
@@ -38,7 +45,7 @@ The distribution of the P-values and a semi-volcano plot can be also displayed.
 }
 \details{
 Multiple testing correction can be performed using either Benjamini-Hochberg (\code{\link{p.adjust}} method) 
-or Storey (\code{\link{qvalue}} method) approach for FDR.
+or Storey (\code{\link{qvalue}} method) approach for FDR. 
 
 If \code{svQTL.removal = TRUE} and svQTLs were tested in 'sqtl.seeker', gene/SNPs with
 significant svQTL association (after multiple testing correction and similar FDR threshold)
