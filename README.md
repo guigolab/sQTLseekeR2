@@ -1,5 +1,7 @@
 # sQTLseekeR2
 
+[![R-CMD-check](https://github.com/guigolab/sQTLseekeR2/workflows/R-CMD-check/badge.svg)](https://github.com/guigolab/sQTLseekeR2/actions)
+
 `sQTLseekeR2` is an enhanced version of [sQTLseekeR](https://github.com/guigolab/sQTLseekeR), an R package to detect splicing QTLs (sQTLs).
 
 ## Installation 
