@@ -9,6 +9,7 @@ Description: Functions for sQTL mapping.
 License: GPL-3 | file LICENSE
 Encoding: UTF-8
 Depends:
+    R (>= 3.3.2)
 BiocViews:
     Rsamtools,
     GenomicRanges,
