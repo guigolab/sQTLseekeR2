@@ -131,7 +131,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                 covariates <- covariates[com.samples, , drop = FALSE]
                 multiclass <- apply(covariates, 2, function(x){length(table(x)) > 1})
                 covariates <- covariates[, multiclass, drop = FALSE]
-                if (verbose){
+                if (verbose & any(!multiclass)){
                   message("\t", "Covariates removed due to only one value: ", 
                           paste(names(multiclass)[!multiclass], collapse = ", "))
                 }
