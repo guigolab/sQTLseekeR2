@@ -44,7 +44,14 @@ to recover all significant variant-gene pairs, implements a procedure identical 
 
 For additional information on the analysis steps you can have a look at [sQTLseekeR](https://github.com/guigolab/sQTLseekeR).
 
-## Running sQTLseekeR2 on computing clusters
+## Running sQTLseekeR2 on computing clusters (recommended)
 
 `sQTLseekeR2` can be easily used on a cluster thanks to [Nextflow](https://www.nextflow.io). See [sqtlseeker2-nf](https://github.com/guigolab/sqtlseeker2-nf) for details.
+
+## Cite sQTLseekeR2
+
+If you find `sQTLseekeR2` useful in your research please cite the related publication:
+
+Garrido-Martín, D., Borsari, B., Calvo, M., Reverter, F., Guigó, R. Identification and analysis of splicing quantitative trait loci across multiple tissues in the human genome. *Nat Commun* 12, 727 (2021). [https://doi.org/10.1038/s41467-020-20578-2](https://doi.org/10.1038/s41467-020-20578-2)
+
 
