@@ -1,6 +1,6 @@
 Package: sQTLseekeR2
 Type: Package
-Title: Splicing QTL discovery tool
+Title: R package for splicing QTL mapping
 Version: 1.0.0
 Date: 2019-05-09
 Author: Diego Garrido-Martín, Jean Monlong, Miquel Calvo, Ferran Reverter, Roderic Guigo.
@@ -13,7 +13,7 @@ BiocViews:
     Rsamtools,
     GenomicRanges,
     IRanges,
-    qvalue,
+    qvalue
 Imports:
     Rsamtools,
     GenomicRanges,

@@ -47,7 +47,7 @@ We consider two levels of multiple testing:
 \itemize{
 \item{1. Multiple genetic variants are tested per gene.}
 \item{2. Multiple genes are tested genome-wide.}}
-sQTLseekeR uses a permutation approach, implemented and detailed in \code{\link{sqtl.seeker.p}} to correct for
+sQTLseekeR2 uses a permutation approach, implemented and detailed in \code{\link{sqtl.seeker.p}} to correct for
 the former and false discovery rate (FDR) estimation to control for the latter. Both Benjamini-Hochberg (\code{\link{p.adjust}} method) 
 and Storey (\code{\link{qvalue}} method) approaches for FDR can be applied.
 

@@ -4,7 +4,7 @@
 \alias{compute.empirical.pv}
 \title{Compute empirical P-value}
 \usage{
-\method{compute}{empirical.pv}(
+compute.empirical.pv(
   genotype.gene,
   tre.mt,
   best.snp,

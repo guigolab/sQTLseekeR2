@@ -2,7 +2,7 @@
 % Please edit documentation in R/sqtl.seeker.p.R
 \name{sqtl.seeker.p}
 \alias{sqtl.seeker.p}
-\title{permuted sQTL seeker}
+\title{Permuted sQTL seeker}
 \usage{
 sqtl.seeker.p(
   tre.df,
@@ -61,10 +61,16 @@ A data.frame with columns:
 \item{runtime}{approximated computation time per gene.}
 }
 \description{
-\code{sqtl.seeker.p} description
+\code{sqtl.seeker.p} performs the same test as \code{sqtl.seeker} between SNPs and
+relative transcript expression values, prior permutation of individual labels (see
+Details).
 }
 \details{
-Details
+\code{sqtl.seeker.p} implements an adaptive permutation procedure to control for 
+multiple testing (i.e. multiple genetic variants are tested per gene, see also 
+\code{\link{sqtls.p}}). The outcome of the permutations is then modeled using beta
+distributions, as in FastQTL (Ongen et al., 2015), allowing to compute an adjusted 
+empirical P-value per gene.
 }
 \author{
 Diego Garrido-Martín

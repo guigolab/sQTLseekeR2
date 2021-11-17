@@ -9,6 +9,7 @@
 ##' @return a data.frame with the retrieved BED information.
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
+##' @import data.table
 read.bedix <- function(file, subset.reg = NULL, header = TRUE) 
 {
     if(!is.character(file)){

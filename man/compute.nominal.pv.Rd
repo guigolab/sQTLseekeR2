@@ -4,7 +4,7 @@
 \alias{compute.nominal.pv}
 \title{Compute nominal P-value}
 \usage{
-\method{compute}{nominal.pv}(
+compute.nominal.pv(
   geno.df,
   tre.mt,
   permute = FALSE,
