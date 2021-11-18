@@ -8,7 +8,7 @@
 ##' the \code{\link[CompQuadForm]{farebrother}} method in the \code{CompQuadForm} package. 
 ##' Default is \code{TRUE}.
 ##' @param res is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}
-##' @param int covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
+##' @param condition covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
 ##' Default is \code{NULL}. This will enable the asymptotic mode. Ignored if \code{res} is \code{FALSE}. 
 ##' @return A data.frame with columns:
 ##' \item{F}{the F score.}
@@ -20,14 +20,14 @@
 ##' @author Diego Garrido-Martín, Jean Monlong
 ##' @keywords internal
 compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALSE,
-                       int = NULL)
+                       condition = NULL)
 {
     if(nrow(geno.df) > 1){
         stop(geno.df$snpId[1], " SNP is duplicated in the genotype file.")
     }
-    if(!is.null(int) && !res){
-        int <- NULL
-        warning("int will be set to NULL (res is FALSE)") # Double-check
+    if(!is.null(condition) && !res){
+        condition <- NULL
+        warning("'condition' will be set to NULL (res is FALSE)") # Double-check
     }
     geno.snp <- as.numeric(geno.df[, rownames(tre.mt)])
     names(geno.snp) <- rownames(tre.mt)
@@ -36,17 +36,17 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
     for (gt in c("-1", "0", "1", "2")){
         info.snp[gt] <- ifelse(is.na(tb.snp[gt]), 0, tb.snp[gt])
     }
-    if (!is.null(int)){
-      int <- int[, 1]
-      names(int) <- rownames(tre.mt)
-      info.int <- paste(as.character(table(int)), collapse = ",")
+    if (!is.null(condition)){
+      condition <- condition[, 1]
+      names(condition) <- rownames(tre.mt)
+      info.condition <- paste(as.character(table(condition)), collapse = ",")
     }
     if (any(geno.snp == -1)) {
         non.na <- geno.snp > -1
         geno.snp <- geno.snp[non.na]
         tre.mt <- tre.mt[non.na, ]
-        if (!is.null(int)){
-          int <- int[non.na]
+        if (!is.null(condition)){
+          condition <- condition[non.na]
         }
     }
     info.snp <- paste(info.snp, collapse =",")
@@ -58,7 +58,7 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
     }   
     mdt <- md.trans(tre.mt2md, groups.snp.f)
  
-    if (is.null(int)){
+    if (is.null(condition)){
       n <- nrow(tre.mt)
       nb.gp <- nlevels(groups.snp.f)
       dfnum <- nb.gp - 1
@@ -101,15 +101,15 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
         res.df$F.svQTL <- bd.perm$F
       }
     } else {
-        info.interaction <- paste(as.character(table(groups.snp.f:int)), collapse = ",")
-        ls <- names(table(int))
-        mdt_l1 <- md.trans(tre.mt2md[int == ls[1], ],
-                           groups.snp.f[int == ls[1]])
-        mdt_l2 <- md.trans(tre.mt2md[int == ls[2], ],
-                           groups.snp.f[int == ls[2]])
+        info.interaction <- paste(as.character(table(groups.snp.f:condition)), collapse = ",")
+        ls <- names(table(condition))
+        mdt_l1 <- md.trans(tre.mt2md[condition == ls[1], ],
+                           groups.snp.f[condition == ls[1]])
+        mdt_l2 <- md.trans(tre.mt2md[condition == ls[2], ],
+                           groups.snp.f[condition == ls[2]])
         tre.mt <- scale(tre.mt, center = TRUE, scale = FALSE)
-        fit <- stats::lm(tre.mt ~ groups.snp.f + int + groups.snp.f:int,
-                  contrasts = list(groups.snp.f = "contr.sum", int = "contr.sum"))
+        fit <- stats::lm(tre.mt ~ groups.snp.f + condition + groups.snp.f:condition,
+                  contrasts = list(groups.snp.f = "contr.sum", condition = "contr.sum"))
         R <- fit$residuals
         n <- nrow(R)
         UU <- car::Anova(fit, type = "II") 
@@ -123,16 +123,16 @@ compFscore <- function(geno.df, tre.mt, svQTL = FALSE, asympt = TRUE, res = FALS
         item.acc <- 1e-14
         pvs <- mapply(pv.ss, ss = unlist(SS), df.i = Df, MoreArgs = list(lambda = e))
         Fs <- f.tilde*df.e/Df
-        res.df <- data.frame(F_snp = Fs[1], F_int = Fs[2], F_snpXint = Fs[3],
-                             pv_snp = pvs[1], pv_int = pvs[2], pv_snpXint = pvs[3], 
+        res.df <- data.frame(F_snp = Fs[1], F_cond = Fs[2], F_snpXcond = Fs[3],
+                             pv_snp = pvs[1], pv_cond = pvs[2], pv_snpXcond = pvs[3], 
                              nb.groups = nlevels(groups.snp.f), md_snp = mdt$md, 
                              tr.first_snp = mdt$tr.first, tr.second_snp = mdt$tr.second,
-                             md_int_l1 = mdt_l1[[1]], md_int_l2 = mdt_l2[[1]], 
+                             md_cond_l1 = mdt_l1[[1]], md_cond_l2 = mdt_l2[[1]], 
                              tr.agree = sum(unlist(mdt_l1[2:3])%in%unlist(mdt_l2[2:3])),                                                                   
-                             info_snp = info.snp, info_int = info.int, 
-                             info_snpXint = info.interaction, stringsAsFactors = FALSE) 
+                             info_snp = info.snp, info_cond = info.condition, 
+                             info_snpXcond = info.interaction, stringsAsFactors = FALSE) 
         if (svQTL) {
-          bd <- vegan::betadisper(stats::dist(tre.mt), groups.snp.f:int, type = "centroid")
+          bd <- vegan::betadisper(stats::dist(tre.mt), groups.snp.f:cond, type = "centroid")
           bd.perm <- permutest.betadisper(bd, control = permute::how(nperm = 2)) 
           res.df$F.svQTL <- bd.perm$F
         }

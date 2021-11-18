@@ -9,7 +9,7 @@ sqtl.seeker(
   genotype.f,
   gene.loc,
   covariates = NULL,
-  int = NULL,
+  condition = NULL,
   genic.window = 5000,
   min.nb.ext.scores = 1000,
   nb.perm.max = 1e+06,
@@ -36,9 +36,9 @@ Must have column 'snpId'.}
 Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.}
 
-\item{int}{name of an additional 2-level categorical covariate to be tested (a model 
-of main effects 'genotype' and 'int', plus interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
-If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'int' is not \code{NULL}.}
+\item{condition}{name of an additional 2-level categorical covariate to be tested (a model 
+of main effects 'genotype' and 'conditon', plus an interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
+If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'condition' is not \code{NULL}.}
 
 \item{genic.window}{the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).}
 

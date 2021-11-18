@@ -38,9 +38,9 @@
 ##' @param covariates a data.frame with covariate information per sample (samples x covariates).
 ##' Rownames should be the sample ids. Covariates can be either \code{numeric} or \code{factor}. 
 ##' When provided, they are regressed out before testing the genotype effect. Default is \code{NULL}.
-##' @param int name of an additional 2-level categorical covariate to be tested (a model 
-##' of main effects 'genotype' and 'int', plus interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
-##' If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'int' is not \code{NULL}.
+##' @param condition name of an additional 2-level categorical covariate to be tested (a model 
+##' of main effects 'genotype' and 'conditon', plus an interaction term is built instead of the 'genotype' model). Default is \code{NULL}. 
+##' If \code{covariates} is \code{NULL} it will be ignored. \code{covariates} needs to be set when 'condition' is not \code{NULL}.
 ##' @param genic.window the window(bp) around the gene in which the SNPs are tested. Default is 5000 (i.e. 5kb).
 ##' @param min.nb.ext.scores the minimum number of permuted score higher than
 ##' the highest true score to allow the computation to stop. Default is 1000.
@@ -73,7 +73,7 @@
 ##' @author Jean Monlong, Diego Garrido-Martín
 ##' @export
 sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL, 
-                        int = NULL,
+                        condition = NULL,
                         genic.window = 5000, min.nb.ext.scores = 1000, 
                         nb.perm.max = 1e6, nb.perm.max.svQTL = 1e4, 
                         svQTL = FALSE, asympt = TRUE, ld.filter = NULL, 
@@ -106,8 +106,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                     stop("More than 5% of the samples contain NA values for at least one covariate.")  
                 }
             } else {
-              if(!is.null(int)){
-                stop("covariates should be not NULL when int is not NULL.")
+              if(!is.null(condition)){
+                stop("'covariates' should be not NULL when 'condition' is not NULL.")
               }
             }
             tre.gene <- tre.gene[, !is.na(tre.gene[1, ])]
@@ -143,13 +143,13 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                   message("\t", "Covariates removed due to only one value: ", 
                           paste(names(multiclass)[!multiclass], collapse = ", "))
                 }
-                if (!is.null(int)){
+                if (!is.null(condition)){
                     asympt <- TRUE
-                    int_tmp <- covariates[, colnames(covariates)%in%int, drop = F]
-                    covariates <- covariates[, !colnames(covariates)%in%int]
-                    int <- int_tmp
-                    if (all(class(int[, 1]) != "factor")){
-                      stop("\t", "int variable should be categorical.")
+                    condition_tmp <- covariates[, colnames(covariates)%in%condition, drop = F]
+                    covariates <- covariates[, !colnames(covariates)%in%condition]
+                    condition <- condition_tmp
+                    if (all(class(condition[, 1]) != "factor")){
+                      stop("\t", "'condition' variable should be categorical.")
                     }
                 }
                 fit <- stats::lm(tre.tc ~ ., data = covariates)
@@ -187,7 +187,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                     snps.to.keep <- check.genotype(genotype.gene[, com.samples], 
                                                    tre.gene[, com.samples], 
                                                    min.nb.ind.geno = min.nb.ind.geno,
-                                                   int = int[, 1]) # int has com.samples already
+                                                   condition = condition[, 1]) # condition has com.samples already
                     if(verbose){
                         snps.to.keep.t <- table(snps.to.keep)
                         message("\t", paste(names(snps.to.keep.t), snps.to.keep.t, 
@@ -205,7 +205,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                                                compFscore(., tre.tc, svQTL = svQTL, 
                                                           asympt = asympt, 
                                                           res = !is.null(covariates),
-                                                          int = int))
+                                                          condition = condition))
                     }
                 }
                 return(res.range)
@@ -224,14 +224,14 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                                                    nb.perm.max = nb.perm.max)) 
                 }
                 if(svQTL){
-                    if(!is.null(int)){
+                    if(!is.null(condition)){
                       res.df$nb.groups <- res.df$nb.groups*2
                     }
                     res.df <- dplyr::do(dplyr::group_by(res.df, nb.groups),
                                         compPvalue(., tre.tc, svQTL = TRUE,
                                                    min.nb.ext.scores = min.nb.ext.scores,
                                                    nb.perm.max = nb.perm.max.svQTL))
-                    if(!is.null(int)){
+                    if(!is.null(condition)){
                       res.df$nb.groups <- res.df$nb.groups/2
                     }
                 }
@@ -240,8 +240,8 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
                 }
                 if ("pv" %in% colnames(res.df)){
                     res.df <- dplyr::arrange(res.df, pv)
-                }else if ("pv_snpXint" %in% colnames(res.df)){
-                    res.df <- dplyr::arrange(res.df, pv_snpXint)
+                }else if ("pv_snpXcond" %in% colnames(res.df)){
+                    res.df <- dplyr::arrange(res.df, pv_snpXcond)
                 }
                 
                 return(data.frame(done = TRUE, res.df))
@@ -272,9 +272,9 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
 ##' @param tre.df a data.frame with transcript relative expression values
 ##' produced by \code{\link{prepare.trans.exp}} corresponding to one gene.
 ##' @param min.nb.ind.geno minimum number of individuals per genotype group if
-##' 'int' is \code{NULL}. Otherwise, minimum number of individuals per
+##' 'condition' is \code{NULL}. Otherwise, minimum number of individuals per
 ##' interaction level.
-##' @param int a 1-column data.frame with the int factor.
+##' @param condition a 1-column data.frame with the condition factor.
 ##' @return A character vector of SNP suitabilities. Possible labels:
 ##' \item{"Missing genotype" (more than 3 missing genotype values)}{ }
 ##' \item{"Only one genotype group"}{ }
@@ -283,7 +283,7 @@ sqtl.seeker <- function(tre.df, genotype.f, gene.loc, covariates = NULL,
 ##' \item{"PASS"}{ }
 ##' @author Jean Monlong, Diego Garrido-Martín 
 ##' @keywords internal
-check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10, int = NULL)
+check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10, condition = NULL)
 {
     apply(geno.df, 1, function(geno.snp){
         if(sum(as.numeric(geno.snp) == -1) > 2){
@@ -293,16 +293,16 @@ check.genotype <- function(geno.df, tre.df, min.nb.ind.geno = 10, int = NULL)
         if (length(geno.snp.t) < 2) {
             return("Only one genotype group")                    
         }
-        if(!is.null(int)){
-          int <- int[geno.snp > -1]
+        if(!is.null(condition)){
+          condition <- condition[geno.snp > -1]
           geno.snp <- geno.snp[geno.snp > -1]
           geno.snp.f <- as.factor(geno.snp)
-          interaction.t <- table(geno.snp.f:int)
+          interaction.t <- table(geno.snp.f:condition)
           if (sum(interaction.t >= min.nb.ind.geno) < length(interaction.t)) {
             return(sprintf("Not all the groups with >%s samples", min.nb.ind.geno))        
           }
           nb.diff.pts <- sapply(names(interaction.t)[interaction.t > 1], function(geno.i){
-            nbDiffPt(tre.df[, which(geno.snp.f:int == geno.i)])
+            nbDiffPt(tre.df[, which(geno.snp.f:condition == geno.i)])
           })
           if(sum(nb.diff.pts >= 5) < length(interaction.t)){
             return("Not all the groups with >5 different splicing patterns")

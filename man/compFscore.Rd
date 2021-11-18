@@ -10,7 +10,7 @@ compFscore(
   svQTL = FALSE,
   asympt = TRUE,
   res = FALSE,
-  int = NULL
+  condition = NULL
 )
 }
 \arguments{
@@ -26,7 +26,7 @@ Default is \code{TRUE}.}
 
 \item{res}{is \code{tre.mt} the residual of the regression of additional covariates. Default is \code{FALSE}}
 
-\item{int}{covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
+\item{condition}{covariate (factor with two levels) to be tested together with the genotype. The interaction term will be also assessed. 
 Default is \code{NULL}. This will enable the asymptotic mode. Ignored if \code{res} is \code{FALSE}.}
 }
 \value{
