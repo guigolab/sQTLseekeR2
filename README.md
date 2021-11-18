@@ -24,12 +24,12 @@ devtools::install_github("guigolab/sQTLseekeR2@interaction")
 one transcript, with low splicing dispersion, with few different splicing patterns or low expression.
 Then relative transcript expression is computed.
 
-* Test for association between splicing ratios and genetic variants in *cis* (nominal pass). `sqtl.seeker` computes a nominal P-value for
-each variant-gene pair, testing for the association between the genotype and the transcript relative expression.
+* Test for association. `sqtl.seeker` assesses the model: splicing ratios ~ genotype + condition + genotype:condition,
+and computes a P-value per term, for each *cis* genetic variant-gene pair.
 
-* Multiple testing correction only available via `eigenMT` in `sqtlseeker2.int-nf` (see below)
+* Multiple testing correction available via [eigenMT](https://github.com/joed3/eigenMT) in sqtlseeker2.int-nf (see below)
 
 ## Running sQTLseekeR2.int on computing clusters (recommended)
 
-`sQTLseekeR2.int` can be easily used on a cluster thanks to [Nextflow](https://www.nextflow.io). See [sqtlseeker2.int-nf](https://github.com/guigolab/sqtlseeker2.int-nf) for details.
+`sQTLseekeR2.int` can be easily used on a cluster thanks to [Nextflow](https://www.nextflow.io). See [sqtlseeker2.int-nf](https://github.com/guigolab/sqtlseeker2-nf/tree/interaction) for details.
 
